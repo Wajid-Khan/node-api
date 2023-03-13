@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require("bcrypt");
 
 //Port
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3007;
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
 });
@@ -42,7 +42,7 @@ app.post("/api/employee/create", async(req, res) => {
         responseObj = {
             "is_success" : true,
             "message" : "Employee has been inserted",
-            "data" : {"empData" : newTodo.rows}
+            "data" : newTodo.rows
         };
         res.json(responseObj);
 
