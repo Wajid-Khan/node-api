@@ -80,7 +80,7 @@ app.get("/api/employees", async(req, res) => {
 });
 
 //get a single employee
-app.get("/api/employees/:id", async(req, res) => {
+app.get("/api/employee/:id", async(req, res) => {
     try{
         const { id } = req.params;
         const employee = await pool.query("SELECT * FROM employees WHERE emp_id = $1", [id]);
