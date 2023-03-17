@@ -286,3 +286,107 @@ app.get("/api/project/:id", async(req, res) => {
 //         res.json(responseObj);
 //     }
 // });
+
+//_______________________________Start__Company___________________________________________________________//
+
+//create a company
+app.post("/api/company/create", async(req, res) => {
+    try{
+        const { com_name} = req.body;
+        const com_id = uuidv4();
+        const comp = await pool.query("INSERT INTO companies (com_id, com_name, created_by, created_date) VALUES($1, $2, $3, $4) RETURNING *", 
+        [com_id, com_name, com_id, dateTime] );
+
+        responseObj = {
+            "is_success" : true,
+            "message" : "Company has been inserted",
+            "data" : comp.rows
+        };
+        res.json(responseObj);
+
+    } catch(err){
+        responseObj = {
+            "is_success" : false,
+            "message" : err.message,
+            "data" : null
+        };
+        res.json(responseObj);
+    }
+});
+
+//get all companies
+app.get("/api/companies", async(req, res) => {
+    try{
+        const allProj = await pool.query("SELECT * FROM companies");
+
+        responseObj = {
+            "is_success" : true,
+            "message" : "List of companies",
+            "data" : allProj.rows
+        };
+
+        res.json(responseObj);
+
+    } catch(err){
+        responseObj = {
+            "is_success" : false,
+            "message" : err.message,
+            "data" : null
+        };
+        res.json(responseObj);
+    }
+});
+
+//_______________________________End__Company___________________________________________________________//
+
+//_______________________________Start__Company__Unit____________________________________________________//
+
+//create a company unit
+app.post("/api/unit/create", async(req, res) => {
+    try{
+        const { proj_id, unit_name, cb_id, com_id} = req.body;
+        const pu_id = uuidv4();
+        const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *", 
+        [pu_id, proj_id, unit_name, cb_id, com_id, com_id, dateTime] );
+
+        responseObj = {
+            "is_success" : true,
+            "message" : "Company unit has been inserted",
+            "data" : comp.rows
+        };
+        res.json(responseObj);
+
+    } catch(err){
+        responseObj = {
+            "is_success" : false,
+            "message" : err.message,
+            "data" : null
+        };
+        res.json(responseObj);
+    }
+});
+
+//get all companies unit
+app.get("/api/units", async(req, res) => {
+    try{
+        const allProj = await pool.query("SELECT * FROM project_units");
+
+        responseObj = {
+            "is_success" : true,
+            "message" : "List of company's unit",
+            "data" : allProj.rows
+        };
+
+        res.json(responseObj);
+
+    } catch(err){
+        responseObj = {
+            "is_success" : false,
+            "message" : err.message,
+            "data" : null
+        };
+        res.json(responseObj);
+    }
+});
+
+//_______________________________End__Company__Unit____________________________________________________//
