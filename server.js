@@ -15,22 +15,13 @@ app.listen(port, () => {
 app.use(cors());
 app.use(express.json()); //req.body
 
-let date_ob = new Date();
-let date = ("0" + date_ob.getDate()).slice(-2);
-let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-let year = date_ob.getFullYear();
-let hours = date_ob.getHours();
-let minutes = date_ob.getMinutes();
-let seconds = date_ob.getSeconds();
-const dateTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
-
 let responseObj = {
     "is_success": false,
     "message": '',
     "data": null
 };
 
-
+//login api
 app.post("/api/employee/login", async (req, res) => {
 
     try {
@@ -227,7 +218,7 @@ app.post("/api/project/create", async (req, res) => {
         const proj_id = uuidv4();
 
         const newProj = await pool.query("INSERT INTO projects (proj_id, proj_name, com_id, cb_id, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6) RETURNING *",
-            [proj_id, proj_name, com_id, cb_id, proj_id, dateTime]);
+            [proj_id, proj_name, com_id, cb_id, proj_id, new Date()]);
 
         responseObj = {
             "is_success": true,
@@ -249,12 +240,20 @@ app.post("/api/project/create", async (req, res) => {
 //get all projects
 app.get("/api/projects", async (req, res) => {
     try {
-        const allProj = await pool.query("SELECT * FROM projects");
-
+        const { size, page, sortField, sortOrder } = req.query;
+        const query = "SELECT * FROM projects where is_delete = 0";
+        if (sortField) {
+            query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
+        }
+        const allProj = await pool.query(query);
+        var start = parseInt((page - 1) * size);
+        var end = parseInt(page * size);
         responseObj = {
             "is_success": true,
             "message": "List of projects",
-            "data": allProj.rows
+            "data": allProj.rows.slice(start, end),
+            "count": allProj.rows.length,
+            "current_page": parseInt(page)
         };
 
         res.json(responseObj);
@@ -294,58 +293,56 @@ app.get("/api/project/:id", async (req, res) => {
 });
 
 // //update a project
-// app.put("/api/project/edit/:id", async(req, res) => {
-//     try{
-//         const { id } = req.params;
-//         const { first_name, middle_name, last_name, email, password, role_id } = req.body;
-//         const emp_update = await pool.query("UPDATE projects SET first_name = $1, middle_name=$2, last_name=$3, email = $4, emp_password = $5, updated_by = $4, role_id = $6, updated_date = $7 WHERE emp_no = $8 RETURNING *", [first_name, middle_name, last_name, email, password, role_id, dateTime, id] );
+app.put("/api/project/edit", async(req, res) => {
+    try{
+        const { proj_no, first_name, middle_name, last_name, email, password, role_id } = req.body;
+        const proj_update = await pool.query("UPDATE projects SET first_name = $1, middle_name=$2, last_name=$3, email = $4, emp_password = $5, updated_by = $4, role_id = $6, updated_date = $7 WHERE proj_no = $8 RETURNING *", [first_name, middle_name, last_name, email, password, role_id, new Date(), proj_no] );
 
-//         responseObj = {
-//             "is_success" : true,
-//             "message" : "project has been updated",
-//             "data" : emp_update.rows
-//         };
+        responseObj = {
+            "is_success" : true,
+            "message" : "project has been updated",
+            "data" : proj_update.rows
+        };
 
-//         res.json(responseObj);
+        res.json(responseObj);
 
-//     } catch(err){
-//         responseObj = {
-//             "is_success" : false,
-//             "message" : err.message,
-//             "data" : null
-//         };
-//         res.json(responseObj);
-//     }
-// });
+    } catch(err){
+        responseObj = {
+            "is_success" : false,
+            "message" : err.message,
+            "data" : null
+        };
+        res.json(responseObj);
+    }
+});
 
 // //delete a project
-// app.delete("/api/project/delete/:id", async(req, res) => {
-//     try{
-//         const { id } = req.params;
-//         const todo = await pool.query("DELETE FROM projects WHERE emp_no = $1", [id]);
+app.delete("/api/project/delete/:id", async(req, res) => {
+    try{
+        const { id } = req.params;
+        const proj = await pool.query("DELETE FROM projects WHERE proj_id = $1", [id]);
 
-//         responseObj = {
-//             "is_success" : true,
-//             "message" : "project has been deleted",
-//             "data" : null
-//         };
+        responseObj = {
+            "is_success" : true,
+            "message" : "project has been deleted",
+            "data" : null
+        };
 
-//         res.json(responseObj);
+        res.json(responseObj);
 
-//     } catch(err){
-//         responseObj = {
-//             "is_success" : false,
-//             "message" : err.message,
-//             "data" : null
-//         };
-//         res.json(responseObj);
-//     }
-// });
+    } catch(err){
+        responseObj = {
+            "is_success" : false,
+            "message" : err.message,
+            "data" : null
+        };
+        res.json(responseObj);
+    }
+});
 
 //_______________________________Start__Company___________________________________________________________//
 
 //create a company
-
 app.post("/api/company/create", async (req, res) => {
     try {
         const { com_name, created_by } = req.body;
@@ -359,62 +356,6 @@ app.post("/api/company/create", async (req, res) => {
             "message": "Company has been inserted",
             "data": comp.rows
         };
-        res.json(responseObj);
-
-    } catch (err) {
-        responseObj = {
-            "is_success": false,
-            "message": err.message,
-            "data": null
-        };
-        res.json(responseObj);
-    }
-});
-
-app.put("/api/company/edit", async (req, res) => {
-    try {
-        const { com_name, updated_by, com_id } = req.body;
-
-        const emp_update = await pool.query("UPDATE companies SET com_name = $1, updated_by = $2, updated_date = $3 WHERE com_id = $4 RETURNING *",
-            [com_name, updated_by, new Date(), com_id]);
-
-        responseObj = {
-            "is_success": true,
-            "message": "Company has been updated",
-            "data": emp_update.rows
-        };
-
-        res.json(responseObj);
-
-    } catch (err) {
-        responseObj = {
-            "is_success": false,
-            "message": err.message,
-            "data": null
-        };
-        res.json(responseObj);
-    }
-});
-
-app.get("/api/company/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const employee = await pool.query("SELECT * FROM companies WHERE com_id = $1", [id]);
-        if (employee.rows.length > 0) {
-            responseObj = {
-                "is_success": true,
-                "message": "",
-                "data": employee.rows[0]
-            };
-        }
-        else {
-            responseObj = {
-                "is_success": false,
-                "message": "No record(s) found",
-                "data": null
-            };
-        }
-
         res.json(responseObj);
 
     } catch (err) {
@@ -459,6 +400,64 @@ app.get("/api/companies", async (req, res) => {
 
 });
 
+//edit company
+app.put("/api/company/edit", async (req, res) => {
+    try {
+        const { com_name, updated_by, com_id } = req.body;
+
+        const emp_update = await pool.query("UPDATE companies SET com_name = $1, updated_by = $2, updated_date = $3 WHERE com_id = $4 RETURNING *",
+            [com_name, updated_by, new Date(), com_id]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "Company has been updated",
+            "data": emp_update.rows
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+//get company by id
+app.get("/api/company/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const employee = await pool.query("SELECT * FROM companies WHERE com_id = $1", [id]);
+        if (employee.rows.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": employee.rows[0]
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": null
+            };
+        }
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 //_______________________________End__Company___________________________________________________________//
 
 //_______________________________Start__Company__Unit____________________________________________________//
@@ -466,10 +465,11 @@ app.get("/api/companies", async (req, res) => {
 //create a company unit
 app.post("/api/unit/create", async (req, res) => {
     try {
-        const { proj_id, unit_name, cb_id, com_id } = req.body;
+        const { proj_id, unit_name, airflow, pressure, cb_id, com_id } = req.body;
         const pu_id = uuidv4();
-        const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-            [pu_id, proj_id, unit_name, cb_id, com_id, com_id, dateTime]);
+        const pu_no = await common.generate_pu_no();;
+        const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+            [pu_id, proj_id, unit_name, cb_id, com_id, com_id, new Date(), pu_no, airflow, pressure]);
 
         responseObj = {
             "is_success": true,
@@ -491,13 +491,80 @@ app.post("/api/unit/create", async (req, res) => {
 //get all companies unit
 app.get("/api/units", async (req, res) => {
     try {
-        const allProj = await pool.query("SELECT * FROM project_units");
+        const { size, page, sortField, sortOrder } = req.query;
+        let query = `SELECT * FROM project_units where is_delete = 0`
+        if (sortField) {
+            query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
+        }
+        const allRows = await pool.query(query);
+        var start = parseInt((page - 1) * size);
+        var end = parseInt(page * size);
 
         responseObj = {
             "is_success": true,
-            "message": "List of company's unit",
-            "data": allProj.rows
+            "message": "List of company units",
+            "data": allRows.rows.slice(start, end),
+            "count": allRows.rows.length,
+            "current_page": parseInt(page)
         };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+//update unit
+app.put("/api/unit/edit", async (req, res) => {
+    try {
+        const { pu_id, unit_name, airflow, pressure, updated_by } = req.body;
+
+        const unit_update = await pool.query("UPDATE project_units SET unit_name = $1, airflow = $2, pressure = $3, updated_by = $4, updated_date = $5 WHERE pu_id = $6 RETURNING *",
+            [unit_name, airflow, pressure, updated_by, new Date(), pu_id]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "Company has been updated",
+            "data": unit_update.rows
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+//get unit by id
+app.get("/api/unit/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const unit = await pool.query("SELECT * FROM project_units WHERE pu_id = $1", [id]);
+        if (unit.rows.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": unit.rows[0]
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": null
+            };
+        }
 
         res.json(responseObj);
 

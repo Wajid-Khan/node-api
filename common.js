@@ -19,6 +19,15 @@ const zeroPad = (num, places) => String(num).padStart(places, '0');
       })
    }
 
+   function generate_pu_no () {
+    let q = `select count(*) from project_units`;
+    return new Promise((resolve, reject) => {
+        pool.query(q, (err, res) => {
+          err ? reject(err) : parseInt(res.rows[0].count) > 0 ? resolve("PU-" + zeroPad(parseInt(res.rows[0].count) +1, 3)): resolve("PU-001");
+        })
+      })
+   }
+
    function generate_branch_no (com_id) {
     let q1 = `select * from companies where com_id = '${com_id}'`;
     return new Promise((resolve, reject) => {
@@ -41,4 +50,4 @@ const zeroPad = (num, places) => String(num).padStart(places, '0');
       })
    }
 
-module.exports = { generate_emp_no, generate_comp_no , generate_branch_no}
+module.exports = { generate_emp_no, generate_comp_no, generate_pu_no, generate_branch_no}
