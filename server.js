@@ -173,7 +173,7 @@ app.put("/api/employee/edit", async (req, res) => {
         const { first_name, middle_name, last_name, role_id, updated_by, emp_id } = req.body;
 
         const emp_update = await pool.query("UPDATE employees SET first_name = $1, middle_name=$2, last_name=$3, role_id = $4, updated_by = $5, updated_date = $6 WHERE emp_id = $7 RETURNING *",
-            [first_name, middle_name, last_name, role_id,  updated_by,new Date(), emp_id]);
+            [first_name, middle_name, last_name, role_id, updated_by, new Date(), emp_id]);
 
         responseObj = {
             "is_success": true,
@@ -352,7 +352,7 @@ app.post("/api/company/create", async (req, res) => {
         const com_id = uuidv4();
         const com_no = await common.generate_comp_no();
         const comp = await pool.query("INSERT INTO companies (com_id, com_name, com_no, created_by, created_date) VALUES($1, $2, $3, $4, $5) RETURNING *",
-            [com_id, com_name,com_no, created_by, new Date()]);
+            [com_id, com_name, com_no, created_by, new Date()]);
 
         responseObj = {
             "is_success": true,
@@ -376,7 +376,7 @@ app.put("/api/company/edit", async (req, res) => {
         const { com_name, updated_by, com_id } = req.body;
 
         const emp_update = await pool.query("UPDATE companies SET com_name = $1, updated_by = $2, updated_date = $3 WHERE com_id = $4 RETURNING *",
-            [com_name, updated_by,new Date(), com_id]);
+            [com_name, updated_by, new Date(), com_id]);
 
         responseObj = {
             "is_success": true,
@@ -459,62 +459,6 @@ app.get("/api/companies", async (req, res) => {
 
 });
 
-app.get("/api/branches/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { size, page, sortField, sortOrder } = req.query;
-        let query = `select * from company_branches where is_delete = 0 and com_id='${id}'`
-        if (sortField) {
-            query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
-        }
-        const allRows = await pool.query(query);
-        var start = parseInt((page - 1) * size);
-        var end = parseInt(page * size);
-        responseObj = {
-            "is_success": true,
-            "message": "List of branches",
-            "data": allRows.rows.slice(start, end),
-            "count": allRows.rows.length,
-            "current_page": parseInt(page)
-        };
-
-        res.json(responseObj);
-
-    } catch (err) {
-        responseObj = {
-            "is_success": false,
-            "message": err.message,
-            "data": null
-        };
-        res.json(responseObj);
-    }
-});
-
-app.post("/api/branch/create", async (req, res) => {
-    try {
-        const { com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by } = req.body;
-        const cb_id = uuidv4();
-        const cb_no = await common.generate_branch_no(com_id);
-        const comp = await pool.query("INSERT INTO company_branches (cb_id, cb_no, com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
-            [cb_id, cb_no, com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by, new Date()]);
-
-        responseObj = {
-            "is_success": true,
-            "message": "Company Branch has been inserted",
-            "data": comp.rows
-        };
-        res.json(responseObj);
-
-    } catch (err) {
-        responseObj = {
-            "is_success": false,
-            "message": err.message,
-            "data": null
-        };
-        res.json(responseObj);
-    }
-});
-
 //_______________________________End__Company___________________________________________________________//
 
 //_______________________________Start__Company__Unit____________________________________________________//
@@ -568,3 +512,125 @@ app.get("/api/units", async (req, res) => {
 });
 
 //_______________________________End__Company__Unit____________________________________________________//
+
+
+//_______________________________Branch__Unit_________________________________________________________//
+
+// Get branches by company id
+app.get("/api/branches/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { size, page, sortField, sortOrder } = req.query;
+        let query = `select * from company_branches where is_delete = 0 and com_id='${id}'`
+        if (sortField) {
+            query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
+        }
+        const allRows = await pool.query(query);
+        var start = parseInt((page - 1) * size);
+        var end = parseInt(page * size);
+        responseObj = {
+            "is_success": true,
+            "message": "List of branches",
+            "data": allRows.rows.slice(start, end),
+            "count": allRows.rows.length,
+            "current_page": parseInt(page)
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+
+
+});
+
+//Create branch
+app.post("/api/branch/create", async (req, res) => {
+    try {
+        const { com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by } = req.body;
+        const cb_id = uuidv4();
+        const cb_no = await common.generate_branch_no(com_id);
+        const comp = await pool.query("INSERT INTO company_branches (cb_id, cb_no, com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
+            [cb_id, cb_no, com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by, new Date()]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "Company Branch has been inserted",
+            "data": comp.rows
+        };
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+// Get branch by id
+app.get("/api/branch/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const branch = await pool.query("SELECT * FROM company_branches WHERE cb_id = $1", [id]);
+        if (branch.rows.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": branch.rows[0]
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": null
+            };
+        }
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+//update a branch
+app.put("/api/branch/edit", async (req, res) => {
+    try {
+        const { cb_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email } = req.body;
+
+        const comp_branch = await pool.query("UPDATE company_branches SET com_branch_name = $1, cb_address = $2, phone_no = $3, primary_contact_name = $4, primary_contact_phone_no = $5, primary_contact_email = $6, updated_by = $7, updated_date = $8 where cb_id = $9 RETURNING *",
+            [com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, cb_id, new Date(), cb_id]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "Company branch has been updated",
+            "data": comp_branch.rows
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+//_______________________________End__Branch__Unit____________________________________________________//
