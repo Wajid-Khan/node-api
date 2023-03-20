@@ -82,7 +82,7 @@ app.post("/api/employee/create", async (req, res) => {
     try {
         const { first_name, middle_name, last_name, email, password, role_id, created_by } = req.body;
         const emp_id = uuidv4();
-        const emp_no = "Emp-" + await common.generate_emp_no();
+        const emp_no = await common.generate_emp_no();
         const newTodo = await pool.query("INSERT INTO employees (emp_id, emp_no , first_name, middle_name, last_name, email, password, created_by, created_date, role_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
             [emp_id, emp_no, first_name, middle_name, last_name, email, crypto.encryptPassowrd(password), created_by, new Date(), role_id]);
 
@@ -350,8 +350,7 @@ app.post("/api/company/create", async (req, res) => {
     try {
         const { com_name, created_by } = req.body;
         const com_id = uuidv4();
-        const com_no = "Com-" + await common.generate_comp_no();
-        console.log(com_no);
+        const com_no = await common.generate_comp_no();
         const comp = await pool.query("INSERT INTO companies (com_id, com_name, com_no, created_by, created_date) VALUES($1, $2, $3, $4, $5) RETURNING *",
             [com_id, com_name,com_no, created_by, new Date()]);
 
@@ -468,7 +467,6 @@ app.get("/api/branches/:id", async (req, res) => {
         if (sortField) {
             query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
         }
-        console.log(query);
         const allRows = await pool.query(query);
         var start = parseInt((page - 1) * size);
         var end = parseInt(page * size);
@@ -496,8 +494,7 @@ app.post("/api/branch/create", async (req, res) => {
     try {
         const { com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by } = req.body;
         const cb_id = uuidv4();
-        const cb_no = "Com-" + await common.generate_comp_no();
-
+        const cb_no = await common.generate_branch_no(com_id);
         const comp = await pool.query("INSERT INTO company_branches (cb_id, cb_no, com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
             [cb_id, cb_no, com_id, com_branch_name, cb_address, phone_no, primary_contact_name, primary_contact_phone_no, primary_contact_email, created_by, new Date()]);
 
