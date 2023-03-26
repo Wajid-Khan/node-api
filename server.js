@@ -98,18 +98,19 @@ app.post("/api/employee/create", async (req, res) => {
 app.get("/api/employees", async (req, res) => {
     try {
         const { size, page, sortField, sortOrder } = req.query;
-        let query = `select e.emp_id, e.emp_no, concat(e.first_name, ' ', e.last_name) as name, e.email, e.is_active, e.is_delete, e.role_id, r.role_name
+        let query = `select e.emp_id, e.emp_no, concat(e.first_name, ' ', e.last_name) as name, e.email, e.is_active, e.is_delete, e.role_id, r.role_name, e.created_date
         FROM employees e left join lookup_roles r on e.role_id = r.role_id where is_delete = 0 and r.role_id > 0`
         if (sortField) {
             query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
         }
         const allEmp = await pool.query(query);
-        var start = parseInt((page - 1) * size);
-        var end = parseInt(page * size);
+        let start = parseInt((page - 1) * size);
+        let end = parseInt(page * size);
+        let rows = page == undefined ? allEmp.rows.sort((a,b)=>b.created_date-a.created_date) : allEmp.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
         responseObj = {
             "is_success": true,
             "message": "List of employees",
-            "data": allEmp.rows.slice(start, end),
+            "data": rows,
             "count": allEmp.rows.length,
             "current_page": parseInt(page)
         };
@@ -214,11 +215,15 @@ app.delete("/api/employee/delete/:id", async (req, res) => {
 //create a project
 app.post("/api/project/create", async (req, res) => {
     try {
-        const { proj_name, com_id, cb_id } = req.body;
+        const { proj_name, com_id, cb_id, created_by } = req.body;
         const proj_id = uuidv4();
+        console.log(proj_id);
+        const proj_no = await common.generate_proj_no(cb_id);
 
-        const newProj = await pool.query("INSERT INTO projects (proj_id, proj_name, com_id, cb_id, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6) RETURNING *",
-            [proj_id, proj_name, com_id, cb_id, proj_id, new Date()]);
+        console.log(proj_no);
+
+        const newProj = await pool.query("INSERT INTO projects (proj_id, proj_no, proj_name, com_id, cb_id, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+            [proj_id, proj_no, proj_name, com_id, cb_id, created_by, new Date()]);
 
         responseObj = {
             "is_success": true,
@@ -240,19 +245,32 @@ app.post("/api/project/create", async (req, res) => {
 //get all projects
 app.get("/api/projects", async (req, res) => {
     try {
-        const { size, page, sortField, sortOrder } = req.query;
-        const query = "SELECT * FROM projects where is_delete = 0";
+        const { size, page, sortField, sortOrder, com_id, cb_id } = req.query;
+        let query = `select p.proj_id, p.proj_name, p.created_date, p.proj_no, p.cb_id, p.com_id, c.com_no, c.com_name,cb.cb_no, cb.com_branch_name
+        from projects p 
+        left join companies c on p.com_id = c.com_id
+        left join company_branches cb on p.cb_id = cb.cb_id
+        where p.is_delete = 0`
+        if(com_id){
+            query += ` and p.com_id = '${com_id}'`
+        }
+        if(cb_id){
+            query += ` and p.cb_id = '${cb_id}'`
+        }
         if (sortField) {
             query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
         }
-        const allProj = await pool.query(query);
-        var start = parseInt((page - 1) * size);
-        var end = parseInt(page * size);
+        const allRows = await pool.query(query);
+
+        let start = parseInt((page - 1) * size);
+        let end = parseInt(page * size);
+        let rows = page == undefined ? allRows.rows.sort((a,b)=>b.created_date-a.created_date) : allRows.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
+
         responseObj = {
             "is_success": true,
-            "message": "List of projects",
-            "data": allProj.rows.slice(start, end),
-            "count": allProj.rows.length,
+            "message": "List of branches",
+            "data": rows,
+            "count": allRows.rows.length,
             "current_page": parseInt(page)
         };
 
@@ -295,12 +313,11 @@ app.get("/api/project/:id", async (req, res) => {
 // //update a project
 app.put("/api/project/edit", async(req, res) => {
     try{
-        const { proj_no, first_name, middle_name, last_name, email, password, role_id } = req.body;
-        const proj_update = await pool.query("UPDATE projects SET first_name = $1, middle_name=$2, last_name=$3, email = $4, emp_password = $5, updated_by = $4, role_id = $6, updated_date = $7 WHERE proj_no = $8 RETURNING *", [first_name, middle_name, last_name, email, password, role_id, new Date(), proj_no] );
-
+        const { proj_name, updated_by, proj_id } = req.body;
+        const proj_update = await pool.query("UPDATE projects SET proj_name = $1, updated_by = $2, updated_date = $3 WHERE proj_id = $4 RETURNING *", [proj_name, updated_by, new Date(), proj_id] );
         responseObj = {
             "is_success" : true,
-            "message" : "project has been updated",
+            "message" : "Project has been updated",
             "data" : proj_update.rows
         };
 
@@ -377,12 +394,14 @@ app.get("/api/companies", async (req, res) => {
             query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
         }
         const allRows = await pool.query(query);
-        var start = parseInt((page - 1) * size);
-        var end = parseInt(page * size);
+        let start = parseInt((page - 1) * size);
+        let end = parseInt(page * size);
+        let rows = page == undefined ? allRows.rows.sort((a,b)=>b.created_date-a.created_date) : allRows.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
+
         responseObj = {
             "is_success": true,
             "message": "List of companies",
-            "data": allRows.rows.slice(start, end),
+            "data": rows,
             "count": allRows.rows.length,
             "current_page": parseInt(page)
         };
@@ -462,18 +481,51 @@ app.get("/api/company/:id", async (req, res) => {
 
 //_______________________________Start__Company__Unit____________________________________________________//
 
+
+//get unit by id
+app.get("/api/project/units/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const unit = await pool.query("SELECT * FROM project_units WHERE proj_id = $1", [id]);
+        if (unit.rows.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": unit.rows
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": []
+            };
+        }
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 //create a company unit
 app.post("/api/unit/create", async (req, res) => {
     try {
-        const { proj_id, unit_name, airflow, pressure, cb_id, com_id } = req.body;
+        const { proj_id, unit_name, airflow, pressure, cb_id, com_id, created_by } = req.body;
         const pu_id = uuidv4();
-        const pu_no = await common.generate_pu_no();;
+        const pu_no = await common.generate_pu_no(proj_id);
         const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
-            [pu_id, proj_id, unit_name, cb_id, com_id, com_id, new Date(), pu_no, airflow, pressure]);
+            [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure]);
 
         responseObj = {
             "is_success": true,
-            "message": "Company unit has been inserted",
+            "message": "Unit has been inserted",
             "data": comp.rows
         };
         res.json(responseObj);
@@ -491,19 +543,25 @@ app.post("/api/unit/create", async (req, res) => {
 //get all companies unit
 app.get("/api/units", async (req, res) => {
     try {
-        const { size, page, sortField, sortOrder } = req.query;
+        const { proj_id, size, page, sortField, sortOrder } = req.query;
         let query = `SELECT * FROM project_units where is_delete = 0`
+        if(com_id){
+            query += ` and proj_id = '${proj_id}'`
+        }
+
         if (sortField) {
             query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
         }
-        const allRows = await pool.query(query);
-        var start = parseInt((page - 1) * size);
-        var end = parseInt(page * size);
 
+        const allRows = await pool.query(query);
+
+        let start = parseInt((page - 1) * size);
+        let end = parseInt(page * size);
+        let rows = page == undefined ? allRows.rows.sort((a,b)=>b.created_date-a.created_date) : allRows.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
         responseObj = {
             "is_success": true,
             "message": "List of company units",
-            "data": allRows.rows.slice(start, end),
+            "data": rows,
             "count": allRows.rows.length,
             "current_page": parseInt(page)
         };
@@ -584,6 +642,47 @@ app.get("/api/unit/:id", async (req, res) => {
 //_______________________________Branch__Unit_________________________________________________________//
 
 // Get branches by company id
+
+app.get("/api/branches", async (req, res) => {
+    try {
+        const { size, page, sortField, sortOrder, com_id } = req.query;
+        let query = `select cb.cb_id, cb.com_branch_name, cb.cb_address, cb.primary_contact_name, cb.primary_contact_email, cb.lat, cb."long",
+        cb.cb_no, cb.com_id, cb.phone_no, cb.primary_contact_phone_no, c.com_no, c.com_name, cb.created_date 
+        from company_branches cb 
+        left join companies c on cb.com_id = c.com_id
+        where cb.is_delete = 0`
+        if(com_id){
+            query += ` and cb.com_id = '${com_id}'`
+        }
+
+        if (sortField) {
+            query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
+        }
+        const allRows = await pool.query(query);
+        let start = parseInt((page - 1) * size);
+        let end = parseInt(page * size);
+        let rows = page == undefined ? allRows.rows.sort((a,b)=>b.created_date-a.created_date) : allRows.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
+
+        responseObj = {
+            "is_success": true,
+            "message": "List of branches",
+            "data": rows,
+            "count": allRows.rows.length,
+            "current_page": parseInt(page)
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 app.get("/api/branches/:id", async (req, res) => {
     try {
         const { id } = req.params;
