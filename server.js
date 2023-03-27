@@ -5,6 +5,7 @@ const pool = require("./db");
 const { v4: uuidv4 } = require('uuid');
 const crypto = require("./crypto");
 const common = require("./common");
+const fs = require("fs");
 //Port
 const port = process.env.PORT || 3007;
 app.listen(port, () => {
@@ -106,7 +107,7 @@ app.get("/api/employees", async (req, res) => {
         const allEmp = await pool.query(query);
         let start = parseInt((page - 1) * size);
         let end = parseInt(page * size);
-        let rows = page == undefined ? allEmp.rows.sort((a,b)=>b.created_date-a.created_date) : allEmp.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
+        let rows = page == undefined ? allEmp.rows.sort((a, b) => b.created_date - a.created_date) : allEmp.rows.slice(start, end).sort((a, b) => b.created_date - a.created_date);
         responseObj = {
             "is_success": true,
             "message": "List of employees",
@@ -189,7 +190,7 @@ app.put("/api/employee/edit", async (req, res) => {
 app.delete("/api/employee/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const todo = await pool.query("Update employees Set is_delete=1 WHERE emp_no = $1", [id]);
+        const todo = await pool.query("Update employees Set is_delete=1 WHERE emp_id = $1", [id]);
 
         responseObj = {
             "is_success": true,
@@ -217,11 +218,7 @@ app.post("/api/project/create", async (req, res) => {
     try {
         const { proj_name, com_id, cb_id, created_by } = req.body;
         const proj_id = uuidv4();
-        console.log(proj_id);
         const proj_no = await common.generate_proj_no(cb_id);
-
-        console.log(proj_no);
-
         const newProj = await pool.query("INSERT INTO projects (proj_id, proj_no, proj_name, com_id, cb_id, created_by, created_date) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *",
             [proj_id, proj_no, proj_name, com_id, cb_id, created_by, new Date()]);
 
@@ -246,15 +243,16 @@ app.post("/api/project/create", async (req, res) => {
 app.get("/api/projects", async (req, res) => {
     try {
         const { size, page, sortField, sortOrder, com_id, cb_id } = req.query;
-        let query = `select p.proj_id, p.proj_name, p.created_date, p.proj_no, p.cb_id, p.com_id, c.com_no, c.com_name,cb.cb_no, cb.com_branch_name
+        let query = `select p.proj_id, p.proj_name, p.created_date, p.proj_no, p.cb_id, p.com_id, c.com_no, c.com_name,cb.cb_no, cb.com_branch_name,
+        (select count(*) from project_units where proj_id = p.proj_id) as count 
         from projects p 
         left join companies c on p.com_id = c.com_id
         left join company_branches cb on p.cb_id = cb.cb_id
         where p.is_delete = 0`
-        if(com_id){
+        if (com_id) {
             query += ` and p.com_id = '${com_id}'`
         }
-        if(cb_id){
+        if (cb_id) {
             query += ` and p.cb_id = '${cb_id}'`
         }
         if (sortField) {
@@ -264,7 +262,7 @@ app.get("/api/projects", async (req, res) => {
 
         let start = parseInt((page - 1) * size);
         let end = parseInt(page * size);
-        let rows = page == undefined ? allRows.rows.sort((a,b)=>b.created_date-a.created_date) : allRows.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
+        let rows = page == undefined ? allRows.rows.sort((a, b) => b.created_date - a.created_date) : allRows.rows.slice(start, end).sort((a, b) => b.created_date - a.created_date);
 
         responseObj = {
             "is_success": true,
@@ -311,47 +309,47 @@ app.get("/api/project/:id", async (req, res) => {
 });
 
 // //update a project
-app.put("/api/project/edit", async(req, res) => {
-    try{
+app.put("/api/project/edit", async (req, res) => {
+    try {
         const { proj_name, updated_by, proj_id } = req.body;
-        const proj_update = await pool.query("UPDATE projects SET proj_name = $1, updated_by = $2, updated_date = $3 WHERE proj_id = $4 RETURNING *", [proj_name, updated_by, new Date(), proj_id] );
+        const proj_update = await pool.query("UPDATE projects SET proj_name = $1, updated_by = $2, updated_date = $3 WHERE proj_id = $4 RETURNING *", [proj_name, updated_by, new Date(), proj_id]);
         responseObj = {
-            "is_success" : true,
-            "message" : "Project has been updated",
-            "data" : proj_update.rows
+            "is_success": true,
+            "message": "Project has been updated",
+            "data": proj_update.rows
         };
 
         res.json(responseObj);
 
-    } catch(err){
+    } catch (err) {
         responseObj = {
-            "is_success" : false,
-            "message" : err.message,
-            "data" : null
+            "is_success": false,
+            "message": err.message,
+            "data": null
         };
         res.json(responseObj);
     }
 });
 
 // //delete a project
-app.delete("/api/project/delete/:id", async(req, res) => {
-    try{
+app.delete("/api/project/delete/:id", async (req, res) => {
+    try {
         const { id } = req.params;
-        const proj = await pool.query("DELETE FROM projects WHERE proj_id = $1", [id]);
-
+        const proj = await pool.query("Update projects Set is_delete=1 WHERE proj_id = $1", [id]);
+        const units = await pool.query("Update project_units Set is_delete=1 WHERE proj_id = $1", [id]);
         responseObj = {
-            "is_success" : true,
-            "message" : "project has been deleted",
-            "data" : null
+            "is_success": true,
+            "message": "Project and all related Units has been deleted",
+            "data": null
         };
 
         res.json(responseObj);
 
-    } catch(err){
+    } catch (err) {
         responseObj = {
-            "is_success" : false,
-            "message" : err.message,
-            "data" : null
+            "is_success": false,
+            "message": err.message,
+            "data": null
         };
         res.json(responseObj);
     }
@@ -396,7 +394,7 @@ app.get("/api/companies", async (req, res) => {
         const allRows = await pool.query(query);
         let start = parseInt((page - 1) * size);
         let end = parseInt(page * size);
-        let rows = page == undefined ? allRows.rows.sort((a,b)=>b.created_date-a.created_date) : allRows.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
+        let rows = page == undefined ? allRows.rows.sort((a, b) => b.created_date - a.created_date) : allRows.rows.slice(start, end).sort((a, b) => b.created_date - a.created_date);
 
         responseObj = {
             "is_success": true,
@@ -477,6 +475,34 @@ app.get("/api/company/:id", async (req, res) => {
     }
 });
 
+// //delete a company
+app.delete("/api/company/delete/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const comp = await pool.query("Update companies Set is_delete=1 WHERE com_id = $1", [id]);
+        const branch = await pool.query("Update company_branches Set is_delete=1 WHERE com_id = $1", [id]);
+        const proj = await pool.query("Update projects Set is_delete=1 WHERE com_id = $1", [id]);
+        const units = await pool.query("Update project_units Set is_delete=1 WHERE com_id = $1", [id]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "Company along with related its Branches, Projects & Units has been deleted",
+            "data": null
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 //_______________________________End__Company___________________________________________________________//
 
 //_______________________________Start__Company__Unit____________________________________________________//
@@ -518,18 +544,67 @@ app.get("/api/project/units/:id", async (req, res) => {
 app.post("/api/unit/create", async (req, res) => {
     try {
         const { proj_id, unit_name, airflow, pressure, cb_id, com_id, created_by } = req.body;
-        const pu_id = uuidv4();
-        const pu_no = await common.generate_pu_no(proj_id);
-        const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
-            [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure]);
+        const duplicate = await common.check_pu_name([unit_name], proj_id);
+        if (duplicate.length > 0) {
+            responseObj = {
+                "is_success": false,
+                "message": duplicate.map(a => a.unit_name).join(",") + " already exists",
+                "data": duplicate
+            };
+            res.json(responseObj);
+        }
+        else {
+            const pu_id = uuidv4();
+            const pu_no = await common.generate_pu_no(proj_id);
+            const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+                [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure]);
 
+            responseObj = {
+                "is_success": true,
+                "message": "Unit has been inserted",
+                "data": comp.rows
+            };
+            res.json(responseObj);
+        }
+
+
+    } catch (err) {
         responseObj = {
-            "is_success": true,
-            "message": "Unit has been inserted",
-            "data": comp.rows
+            "is_success": false,
+            "message": err.message,
+            "data": null
         };
         res.json(responseObj);
+    }
+});
 
+
+app.post("/api/unit/create/bulk", async (req, res) => {
+    try {
+        let units = req.body;
+        const duplicate = await common.check_pu_name(units.map(a => a.unit_name), units[0].proj_id);
+        if (duplicate.length > 0) {
+            responseObj = {
+                "is_success": false,
+                "message": duplicate.map(a => a.unit_name).join(",") + " already exists",
+                "data": duplicate
+            };
+            res.json(responseObj);
+        }
+        else{
+            for (const i in units) {
+                units[i].pu_id = uuidv4();
+                units[i].pu_no = await common.generate_pu_no(units[i].proj_id);
+                const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+                    [units[i].pu_id, units[i].proj_id, units[i].unit_name, units[i].cb_id, units[i].com_id, units[i].created_by, new Date(), units[i].pu_no, units[i].airflow, units[i].pressure]);
+            }
+            responseObj = {
+                "is_success": true,
+                "message": "Unit has been inserted",
+                "data": null
+            };
+            res.json(responseObj);
+        }
     } catch (err) {
         responseObj = {
             "is_success": false,
@@ -545,7 +620,7 @@ app.get("/api/units", async (req, res) => {
     try {
         const { proj_id, size, page, sortField, sortOrder } = req.query;
         let query = `SELECT * FROM project_units where is_delete = 0`
-        if(com_id){
+        if (com_id) {
             query += ` and proj_id = '${proj_id}'`
         }
 
@@ -557,7 +632,7 @@ app.get("/api/units", async (req, res) => {
 
         let start = parseInt((page - 1) * size);
         let end = parseInt(page * size);
-        let rows = page == undefined ? allRows.rows.sort((a,b)=>b.created_date-a.created_date) : allRows.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
+        let rows = page == undefined ? allRows.rows.sort((a, b) => b.created_date - a.created_date) : allRows.rows.slice(start, end).sort((a, b) => b.created_date - a.created_date);
         responseObj = {
             "is_success": true,
             "message": "List of company units",
@@ -585,7 +660,6 @@ app.put("/api/unit/edit", async (req, res) => {
 
         const unit_update = await pool.query("UPDATE project_units SET unit_name = $1, airflow = $2, pressure = $3, updated_by = $4, updated_date = $5 WHERE pu_id = $6 RETURNING *",
             [unit_name, airflow, pressure, updated_by, new Date(), pu_id]);
-
         responseObj = {
             "is_success": true,
             "message": "Company has been updated",
@@ -636,6 +710,30 @@ app.get("/api/unit/:id", async (req, res) => {
     }
 });
 
+//delete a employee
+app.delete("/api/unit/delete/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const todo = await pool.query("Update project_units Set is_delete=1 WHERE pu_id = $1", [id]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "Unit has been deleted",
+            "data": null
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 //_______________________________End__Company__Unit____________________________________________________//
 
 
@@ -651,7 +749,7 @@ app.get("/api/branches", async (req, res) => {
         from company_branches cb 
         left join companies c on cb.com_id = c.com_id
         where cb.is_delete = 0`
-        if(com_id){
+        if (com_id) {
             query += ` and cb.com_id = '${com_id}'`
         }
 
@@ -661,7 +759,7 @@ app.get("/api/branches", async (req, res) => {
         const allRows = await pool.query(query);
         let start = parseInt((page - 1) * size);
         let end = parseInt(page * size);
-        let rows = page == undefined ? allRows.rows.sort((a,b)=>b.created_date-a.created_date) : allRows.rows.slice(start, end).sort((a,b)=>b.created_date-a.created_date);
+        let rows = page == undefined ? allRows.rows.sort((a, b) => b.created_date - a.created_date) : allRows.rows.slice(start, end).sort((a, b) => b.created_date - a.created_date);
 
         responseObj = {
             "is_success": true,
@@ -799,4 +897,42 @@ app.put("/api/branch/edit", async (req, res) => {
     }
 });
 
+// //delete a company
+app.delete("/api/branch/delete/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const branch = await pool.query("Update company_branches Set is_delete=1 WHERE cb_id = $1", [id]);
+        const proj = await pool.query("Update projects Set is_delete=1 WHERE cb_id = $1", [id]);
+        const units = await pool.query("Update project_units Set is_delete=1 WHERE cb_id = $1", [id]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "Branches along with its related Projects & Units has been deleted",
+            "data": null
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 //_______________________________End__Branch__Unit____________________________________________________//
+
+
+app.get('/api/generate_employee_pdf/:id', async (req, resp) => {
+    const { id } = req.params;
+    const employee = await pool.query("SELECT * FROM employees WHERE emp_id = $1", [id]);
+    const response = await common.generate_pdf(employee);
+    fs.readFile(response.filename, function (err, data){
+        resp.contentType("application/pdf");
+        resp.send(data);
+    });
+});
