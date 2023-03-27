@@ -187,7 +187,7 @@ app.put("/api/employee/edit", async (req, res) => {
 });
 
 //delete a employee
-app.delete("/api/employee/delete/:id", async (req, res) => {
+app.get("/api/employee/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const todo = await pool.query("Update employees Set is_delete=1 WHERE emp_id = $1", [id]);
@@ -244,7 +244,7 @@ app.get("/api/projects", async (req, res) => {
     try {
         const { size, page, sortField, sortOrder, com_id, cb_id } = req.query;
         let query = `select p.proj_id, p.proj_name, p.created_date, p.proj_no, p.cb_id, p.com_id, c.com_no, c.com_name,cb.cb_no, cb.com_branch_name,
-        (select count(*) from project_units where proj_id = p.proj_id) as count 
+        (select count(*) from project_units where proj_id = p.proj_id and is_delete=0) as count 
         from projects p 
         left join companies c on p.com_id = c.com_id
         left join company_branches cb on p.cb_id = cb.cb_id
@@ -332,7 +332,7 @@ app.put("/api/project/edit", async (req, res) => {
 });
 
 // //delete a project
-app.delete("/api/project/delete/:id", async (req, res) => {
+app.get("/api/project/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const proj = await pool.query("Update projects Set is_delete=1 WHERE proj_id = $1", [id]);
@@ -476,7 +476,7 @@ app.get("/api/company/:id", async (req, res) => {
 });
 
 // //delete a company
-app.delete("/api/company/delete/:id", async (req, res) => {
+app.get("/api/company/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -711,7 +711,7 @@ app.get("/api/unit/:id", async (req, res) => {
 });
 
 //delete a employee
-app.delete("/api/unit/delete/:id", async (req, res) => {
+app.get("/api/unit/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const todo = await pool.query("Update project_units Set is_delete=1 WHERE pu_id = $1", [id]);
@@ -897,8 +897,8 @@ app.put("/api/branch/edit", async (req, res) => {
     }
 });
 
-// //delete a company
-app.delete("/api/branch/delete/:id", async (req, res) => {
+// //delete a branch
+app.get("/api/branch/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
 
