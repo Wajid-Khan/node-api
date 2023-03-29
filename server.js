@@ -512,7 +512,11 @@ app.get("/api/company/delete/:id", async (req, res) => {
 app.get("/api/project/units/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const unit = await pool.query("SELECT * FROM project_units WHERE proj_id = $1", [id]);
+        let query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,
+        pu.pu_no, pu.airflow, pu.pressure, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, aluc.unit as airflow_unit, pluc.unit as pressure_unit
+            from project_units pu left join lookup_unit_conversion aluc on aluc.luc_id = pu.airflow_luc_id
+            left join lookup_unit_conversion pluc on pluc.luc_id = pu.pressure_luc_id where pu.proj_id = $1`
+        const unit = await pool.query(query, [id]);
         if (unit.rows.length > 0) {
             responseObj = {
                 "is_success": true,
@@ -543,7 +547,7 @@ app.get("/api/project/units/:id", async (req, res) => {
 //create a company unit
 app.post("/api/unit/create", async (req, res) => {
     try {
-        const { proj_id, unit_name, airflow, pressure, cb_id, com_id, created_by } = req.body;
+        const { proj_id, unit_name, airflow, pressure, cb_id, com_id, created_by, airflow_luc_id, pressure_luc_id } = req.body;
         const duplicate = await common.check_pu_name([unit_name], proj_id);
         if (duplicate.length > 0) {
             responseObj = {
@@ -556,8 +560,8 @@ app.post("/api/unit/create", async (req, res) => {
         else {
             const pu_id = uuidv4();
             const pu_no = await common.generate_pu_no(proj_id);
-            const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
-                [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure]);
+            const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
+                [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id]);
 
             responseObj = {
                 "is_success": true,
@@ -619,7 +623,10 @@ app.post("/api/unit/create/bulk", async (req, res) => {
 app.get("/api/units", async (req, res) => {
     try {
         const { proj_id, size, page, sortField, sortOrder } = req.query;
-        let query = `SELECT * FROM project_units where is_delete = 0`
+        let query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,
+        pu.pu_no, pu.airflow, pu.pressure, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, aluc.unit as airflow_unit, pluc.unit as pressure_unit
+            from project_units pu left join lookup_unit_conversion aluc on aluc.luc_id = pu.airflow_luc_id
+            left join lookup_unit_conversion pluc on pluc.luc_id = pu.pressure_luc_id where pu.is_delete = 0`
         if (com_id) {
             query += ` and proj_id = '${proj_id}'`
         }
@@ -656,10 +663,10 @@ app.get("/api/units", async (req, res) => {
 //update unit
 app.put("/api/unit/edit", async (req, res) => {
     try {
-        const { pu_id, unit_name, airflow, pressure, updated_by } = req.body;
+        const { pu_id, unit_name, airflow, pressure, updated_by, airflow_luc_id, pressure_luc_id } = req.body;
 
-        const unit_update = await pool.query("UPDATE project_units SET unit_name = $1, airflow = $2, pressure = $3, updated_by = $4, updated_date = $5 WHERE pu_id = $6 RETURNING *",
-            [unit_name, airflow, pressure, updated_by, new Date(), pu_id]);
+        const unit_update = await pool.query("UPDATE project_units SET unit_name = $1, airflow = $2, pressure = $3, updated_by = $4, updated_date = $5, airflow_luc_id =$7, pressure_luc_id = $8 WHERE pu_id = $6 RETURNING *",
+            [unit_name, airflow, pressure, updated_by, new Date(), pu_id, airflow_luc_id, pressure_luc_id]);
         responseObj = {
             "is_success": true,
             "message": "Company has been updated",
@@ -932,6 +939,34 @@ app.get("/api/branch/delete/:id", async (req, res) => {
 app.get("/api/lookup/fans", async (req, res) => {
     try {
         const unit = await pool.query("SELECT * FROM lookup_fans");
+        if (unit.rows.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": unit.rows
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": []
+            };
+        }
+        res.json(responseObj);
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+app.get("/api/lookup/unitconversions", async (req, res) => {
+    try {
+        const unit = await pool.query("SELECT * FROM lookup_unit_conversion order by type asc");
         if (unit.rows.length > 0) {
             responseObj = {
                 "is_success": true,
