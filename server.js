@@ -288,7 +288,7 @@ app.get("/api/projects", async (req, res) => {
 app.get("/api/project/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const project = await pool.query("SELECT * FROM projects WHERE proj_id = $1", [id]);
+        const project = await pool.query("SELECT *,  (select count(*) from project_units where proj_id = $1 and is_delete=0) as count  FROM projects WHERE proj_id = $1", [id]);
 
         responseObj = {
             "is_success": true,
@@ -925,6 +925,39 @@ app.get("/api/branch/delete/:id", async (req, res) => {
 });
 
 //_______________________________End__Branch__Unit____________________________________________________//
+
+
+//_______________________________Lookups____________________________________________________//
+
+app.get("/api/lookup/fans", async (req, res) => {
+    try {
+        const unit = await pool.query("SELECT * FROM lookup_fans");
+        if (unit.rows.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": unit.rows
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": []
+            };
+        }
+        res.json(responseObj);
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+//_______________________________End__Lookups____________________________________________________//
 
 
 app.get('/api/generate_employee_pdf/:id', async (req, resp) => {
