@@ -210,6 +210,27 @@ app.get("/api/employee/delete/:id", async (req, res) => {
     }
 });
 
+//Change employee password api
+app.post('/api/change_employee_password', async (req, resp) => {
+    try {
+        const { emp_id, password, updated_by } = req.body;
+        await pool.query("UPDATE employees SET password = $2, updated_by = $3, updated_date = $4, password_changed_date = $5 WHERE emp_id = $1", [emp_id, crypto.encryptPassowrd(password), updated_by, new Date(), new Date()]);
+        responseObj = {
+            "is_success": true,
+            "message": "Password has been updated",
+            "data": null
+        };
+        resp.json(responseObj);
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        resp.json(responseObj);
+    }
+});
+//____________________________________Employees_API__________________________________//
 
 //____________________________________Project_API__________________________________//
 
