@@ -6,6 +6,9 @@ const { v4: uuidv4 } = require('uuid');
 const crypto = require("./crypto");
 const common = require("./common");
 const fs = require("fs");
+const PDFDocument = require('pdfkit');
+const { createPdf } = require("./pdf.js");
+
 //Port
 const port = process.env.PORT || 3007;
 app.listen(port, () => {
@@ -211,10 +214,10 @@ app.get("/api/employee/delete/:id", async (req, res) => {
 });
 
 //Change employee password api
-app.post('/api/change_employee_password', async (req, resp) => {
+app.put('/api/employee/change_password', async (req, resp) => {
     try {
-        const { emp_id, password, updated_by } = req.body;
-        await pool.query("UPDATE employees SET password = $2, updated_by = $3, updated_date = $4, password_changed_date = $5 WHERE emp_id = $1", [emp_id, crypto.encryptPassowrd(password), updated_by, new Date(), new Date()]);
+        const { emp_id, new_password, confirm_password, updated_by } = req.body;
+        await pool.query("UPDATE employees SET password = $2, updated_by = $3, updated_date = $4, password_changed_date = $5 WHERE emp_id = $1", [emp_id, crypto.encryptPassowrd(new_password), updated_by, new Date(), new Date()]);
         responseObj = {
             "is_success": true,
             "message": "Password has been updated",
@@ -1017,11 +1020,28 @@ app.get("/api/lookup/unitconversions", async (req, res) => {
 
 
 app.get('/api/generate_employee_pdf/:id', async (req, resp) => {
-    const { id } = req.params;
-    const employee = await pool.query("SELECT * FROM employees WHERE emp_id = $1", [id]);
-    const response = await common.generate_pdf(employee);
-    fs.readFile(response.filename, function (err, data){
-        resp.contentType("application/pdf");
-        resp.send(data);
-    });
+    try {
+        const { id } = req.params;
+        const employee = await pool.query("SELECT * FROM employees WHERE emp_id = $1", [id]);
+
+        const doc = new PDFDocument();
+        doc.pipe(fs.createWriteStream(`pdf-files/${id}.pdf`));
+        doc.text(employee.rows[0].first_name);
+        doc.end();
+        resp.json(doc);
+    } catch (error) {
+        resp.json(error);
+    }
+
 });
+
+app.get("/api/pdf", async (req, res) => {
+    const id = 'ea30c144-f60a-4bd5-a7be-acf2c2aa271b';
+    const employee = await pool.query("SELECT * FROM employees WHERE emp_id = $1", [id]);
+    createPdf(employee.rows[0], `pdf-files/${id}.pdf`);
+    res.json("pdf created");
+
+} );
+
+app.use(express.static('public'));
+app.use('/pdf-files', express.static(__dirname + '/pdf-files'));

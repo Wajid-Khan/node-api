@@ -101,44 +101,55 @@ const zeroPad = (num, places) => String(num).padStart(places, '0');
    }
 
    function generate_pdf (employee) {
-    const empInfo = {
-      emp_no : employee.rows[0].emp_no,
-      fname : employee.rows[0].first_name,
-      lname : employee.rows[0].last_name,
-      email : employee.rows[0].email,
-      role_id : employee.rows[0].role_id
+
+    try {
+      
+
+        return new Promise((resolve, reject) => {
+
+          const empInfo = {
+            emp_no : '124',
+            fname : 'Wajid',
+            lname : 'Khan',
+            email : 'wajid@gmail.com',
+            role_id : '2',
+          }
+    
+          var html = fs.readFileSync(path.join(__dirname, "./table.html"), "utf8");
+            var options = {
+                format : "A4",
+                orientation : "portrait",
+                border : "10mm",
+                header: {
+                    height: "45mm",
+                    contents: '<div style="text-align: center;"><h1>Aero Fans</h1></div>'
+                },
+            }
+            const output = empInfo.emp_no;
+            const filePath = path.join(__dirname,`./pdf-files/${output}.pdf`);
+    
+            var document = {
+              html : html,
+              data : {
+                  users : empInfo
+              },
+              path : `./pdf-files/${output}.pdf`,
+              type : ""
+            }
+            
+          pdf.create(document, options).then((res) => {
+            resolve(document);
+            // resolve(res);
+          })
+          .catch((error) => {
+              reject(error)
+          })
+        })
+    } catch (error) {
+      return error
     }
 
-    var html = fs.readFileSync(path.join(__dirname, "./table.html"), "utf8");
-      var options = {
-          format : "A4",
-          orientation : "portrait",
-          border : "10mm",
-          header: {
-              height: "45mm",
-              contents: '<div style="text-align: center;"><h1>Aero Fans</h1></div>'
-          },
-      }
-      const output = empInfo.emp_no;
-      const filePath = path.join(__dirname,`./pdf-files/${output}.pdf`);
-
-      var document = {
-        html : html,
-        data : {
-            users : empInfo
-        },
-        path : `./pdf-files/${output}.pdf`,
-        type : ""
-      }
-
-      return new Promise((resolve, reject) => {
-        pdf.create(document, options).then((res) => {
-          resolve(res);
-        })
-        .catch((error) => {
-            reject(error)
-        })
-      })
+    
    }
 
 module.exports = { generate_emp_no, generate_comp_no, generate_branch_no, generate_proj_no, generate_pu_no, check_pu_name, generate_pdf}
