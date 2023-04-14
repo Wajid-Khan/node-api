@@ -571,7 +571,7 @@ app.get("/api/project/units/:id", async (req, res) => {
 //create a company unit
 app.post("/api/unit/create", async (req, res) => {
     try {
-        const { proj_id, unit_name, airflow, pressure, cb_id, com_id, created_by, airflow_luc_id, pressure_luc_id } = req.body;
+        const { proj_id, unit_name, airflow, pressure, cb_id, com_id, created_by, airflow_luc_id, pressure_luc_id, pressure_type } = req.body;
         const duplicate = await common.check_pu_name([unit_name], proj_id);
         if (duplicate.length > 0) {
             responseObj = {
@@ -584,8 +584,8 @@ app.post("/api/unit/create", async (req, res) => {
         else {
             const pu_id = uuidv4();
             const pu_no = await common.generate_pu_no(proj_id);
-            const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *",
-                [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id]);
+            const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id, pressure_type) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *",
+                [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id, pressure_type]);
 
             responseObj = {
                 "is_success": true,
@@ -687,13 +687,13 @@ app.get("/api/units", async (req, res) => {
 //update unit
 app.put("/api/unit/edit", async (req, res) => {
     try {
-        const { pu_id, unit_name, airflow, pressure, updated_by, airflow_luc_id, pressure_luc_id } = req.body;
+        const { pu_id, unit_name, airflow, pressure, updated_by, airflow_luc_id, pressure_luc_id, pressure_type } = req.body;
 
-        const unit_update = await pool.query("UPDATE project_units SET unit_name = $1, airflow = $2, pressure = $3, updated_by = $4, updated_date = $5, airflow_luc_id =$7, pressure_luc_id = $8 WHERE pu_id = $6 RETURNING *",
-            [unit_name, airflow, pressure, updated_by, new Date(), pu_id, airflow_luc_id, pressure_luc_id]);
+        const unit_update = await pool.query("UPDATE project_units SET unit_name = $1, airflow = $2, pressure = $3, updated_by = $4, updated_date = $5, airflow_luc_id =$7, pressure_luc_id = $8, pressure_type = $9 WHERE pu_id = $6 RETURNING *",
+            [unit_name, airflow, pressure, updated_by, new Date(), pu_id, airflow_luc_id, pressure_luc_id, pressure_type]);
         responseObj = {
             "is_success": true,
-            "message": "Company has been updated",
+            "message": "Company unit has been updated",
             "data": unit_update.rows
         };
 
