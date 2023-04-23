@@ -8,11 +8,14 @@ const common = require("./common");
 const fs = require("fs");
 const PDFDocument = require('pdfkit');
 const { createPdf } = require("./pdf.js");
+const fanData = require("./files/fansdata");
+const _ = require("lodash");
 
 //Port
 const port = process.env.PORT || 3007;
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
+    // externalApi()
 });
 
 //middleware
@@ -537,7 +540,7 @@ app.get("/api/project/units/:id", async (req, res) => {
     try {
         const { id } = req.params;
         let query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,
-        pu.pu_no, pu.airflow, pu.pressure, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, aluc.unit as airflow_unit, pluc.unit as pressure_unit
+        pu.pu_no, pu.airflow, pu.pressure, pu.pressure_type, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, aluc.unit as airflow_unit, pluc.unit as pressure_unit
             from project_units pu left join lookup_unit_conversion aluc on aluc.luc_id = pu.airflow_luc_id
             left join lookup_unit_conversion pluc on pluc.luc_id = pu.pressure_luc_id where pu.proj_id = $1`
         const unit = await pool.query(query, [id]);
@@ -546,6 +549,39 @@ app.get("/api/project/units/:id", async (req, res) => {
                 "is_success": true,
                 "message": "",
                 "data": unit.rows
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": []
+            };
+        }
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+//get unit data by unit id
+app.get("/api/unitdata/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        let query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,pu.pu_no, pu.airflow, pu.pressure, pu.pressure_type, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, com.com_id, com.com_name, cb.cb_id, cb.com_branch_name, pro.proj_id, pro.proj_name from project_units pu inner join projects pro on pu.proj_id = pro.proj_id inner join companies com on pu.com_id = com.com_id inner join company_branches cb on pu.cb_id = cb.cb_id where pu.pu_id = $1`;
+        const unit = await pool.query(query, [id]);
+        if (unit.rows.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": unit.rows[0]
             };
         }
         else {
@@ -1045,3 +1081,78 @@ app.get("/api/pdf", async (req, res) => {
 
 app.use(express.static('public'));
 app.use('/pdf-files', express.static(__dirname + '/pdf-files'));
+app.use('/files', express.static(__dirname + '/files'));
+
+
+// _______________Api_call__________________ \\
+app.get("/api/fansdata/getrecordsbyairflowpressure", async (req, res) => {
+
+    try {
+        // http://3.109.124.68/getrecordsbyairflowpressure?airflow=50000&pressure=490
+        let url = "http://localhost:3007/files/fansdata.json";
+        const response = await fetch(url);
+        const data = await response.json(); 
+        const mmArr = _.map(data, 'mm')
+        const mmString = mmArr.toString();
+        const unit = await pool.query(`SELECT * FROM lookup_fans where fan_diameter IN (${mmString}) `);
+        const dia = unit.rows;
+        var finalObj = [];
+        data.forEach(element => {
+            let lookUpFanObj = _.filter(dia, function(o) { return o.fan_diameter == element.mm; });
+            let _elem = {
+                ...element,
+                ...lookUpFanObj[0]
+            };
+            finalObj.push(_elem);
+        });
+        responseObj = {
+            "is_success": true,
+            "message": "",
+            "data": finalObj
+        };
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+    res.json(responseObj);
+    
+});
+
+
+// _______________Api_call__________________ \\
+
+
+// _________________________________API____________________________________ \\
+app.get("/api/unitinfo", async (req, res) => {
+    try {
+        
+        if (fanData.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": fanData
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": []
+            };
+        }
+        res.json(responseObj);
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
+// _________________________________API____________________________________ \\

@@ -103,8 +103,6 @@ const zeroPad = (num, places) => String(num).padStart(places, '0');
    function generate_pdf (employee) {
 
     try {
-      
-
         return new Promise((resolve, reject) => {
 
           const empInfo = {
@@ -148,8 +146,6 @@ const zeroPad = (num, places) => String(num).padStart(places, '0');
     } catch (error) {
       return error
     }
-
-    
    }
 
 module.exports = { generate_emp_no, generate_comp_no, generate_branch_no, generate_proj_no, generate_pu_no, check_pu_name, generate_pdf}
