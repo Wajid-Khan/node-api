@@ -10,6 +10,7 @@ const PDFDocument = require('pdfkit');
 const { createPdf } = require("./pdf.js");
 const fanData = require("./files/fansdata");
 const _ = require("lodash");
+const fetch = require("node-fetch");
 
 //Port
 const port = process.env.PORT || 3007;
