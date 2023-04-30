@@ -1125,35 +1125,3 @@ app.get("/api/fansdata/getrecordsbyairflowpressure", async (req, res) => {
 
 
 // _______________Api_call__________________ \\
-
-
-// _________________________________API____________________________________ \\
-app.get("/api/unitinfo", async (req, res) => {
-    try {
-        
-        if (fanData.length > 0) {
-            responseObj = {
-                "is_success": true,
-                "message": "",
-                "data": fanData
-            };
-        }
-        else {
-            responseObj = {
-                "is_success": false,
-                "message": "No record(s) found",
-                "data": []
-            };
-        }
-        res.json(responseObj);
-    } catch (err) {
-        responseObj = {
-            "is_success": false,
-            "message": err.message,
-            "data": null
-        };
-        res.json(responseObj);
-    }
-});
-
-// _________________________________API____________________________________ \\
