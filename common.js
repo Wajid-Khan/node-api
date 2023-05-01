@@ -148,4 +148,13 @@ const zeroPad = (num, places) => String(num).padStart(places, '0');
     }
    }
 
-module.exports = { generate_emp_no, generate_comp_no, generate_branch_no, generate_proj_no, generate_pu_no, check_pu_name, generate_pdf}
+   function generate_motor_id () {
+    let q = `select count(*) from lookup_motors`;
+    return new Promise((resolve, reject) => {
+        pool.query(q, (err, res) => {
+          err ? reject(err) : parseInt(res.rows[0].count) > 0 ? resolve(zeroPad(parseInt(res.rows[0].count)+1, 3)): resolve("1");
+        })
+      })
+   }
+
+module.exports = { generate_emp_no, generate_comp_no, generate_branch_no, generate_proj_no, generate_pu_no, check_pu_name, generate_pdf, generate_motor_id}
