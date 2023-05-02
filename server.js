@@ -1160,7 +1160,7 @@ app.get("/api/motors", async (req, res) => {
 app.get("/api/motor/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const motor = await pool.query("SELECT * FROM lookup_motors WHERE id = $1", [id]);
+        const motor = await pool.query("SELECT * FROM lookup_motors WHERE id = $1 order by id", [id]);
         if (motor.rows.length > 0) {
             responseObj = {
                 "is_success": true,
@@ -1243,7 +1243,7 @@ app.put("/api/motor/edit", async (req, res) => {
 app.get("/api/motor/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const motor = await pool.query("Update lookup_motors Set is_delete = 1 WHERE id = $1", [id]);
+        const motor = await pool.query("Update lookup_motors Set is_delete = 1, updated_by = $2 WHERE id = $1", [id, new Date()]);
 
         responseObj = {
             "is_success": true,
