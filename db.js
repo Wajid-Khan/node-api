@@ -9,6 +9,3 @@ const pool = new Pool({
 });
 
 module.exports = pool;
-
-//host : "52.202.7.252",
-//host : "localhost",
