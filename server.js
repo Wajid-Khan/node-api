@@ -11,7 +11,7 @@ const { createPdf } = require("./pdf.js");
 const fanData = require("./files/fansdata");
 const _ = require("lodash");
 const fetch = require("node-fetch");
-
+const fandata_api_url = "http://localhost:3007/"; //"http://3.109.124.68/";
 //Port
 const port = process.env.PORT || 3007;
 app.listen(port, () => {
@@ -1086,11 +1086,30 @@ app.use('/files', express.static(__dirname + '/files'));
 
 
 // _______________Api_call__________________ \\
-app.get("/api/fansdata/getrecordsbyairflowpressure", async (req, res) => {
+app.post("/api/fansdata/searchfansdata", async (req, res) => {
 
     try {
         // http://3.109.124.68/getrecordsbyairflowpressure?airflow=50000&pressure=490
-        let url = "http://localhost:3007/files/fansdata.json";
+        let url = "";
+        const { fancriteria, airflow, pressure, fan_diameter, angle, fan_start_diameter, fan_end_diameter, start_angle, end_angle } = req.body;
+        
+        if(fancriteria == "ap"){
+            url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}`;
+        }
+        else if(fancriteria == "apd"){
+            url = `${fandata_api_url}getrecordsbydiameter?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}`;
+        }
+        else if(fancriteria == "apda"){
+            url = `${fandata_api_url}getrecordsbyanglediameter?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&angle=${angle}`;
+        }
+        else if(fancriteria == "apdr"){
+            url = `${fandata_api_url}getrecordsbydiameterrange?airflow=${airflow}&pressure=${pressure}&start=${fan_start_diameter}&end=${fan_end_diameter}`;
+        }
+        else{
+            url = `${fandata_api_url}getrecordsbyanglediameter?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&start=${start_angle}&end=${end_angle}`;
+        }
+        console.log(url);
+        url = `${fandata_api_url}files/fansdata.json`;
         const response = await fetch(url);
         const data = await response.json(); 
         const mmArr = _.map(data, 'mm')
@@ -1101,6 +1120,7 @@ app.get("/api/fansdata/getrecordsbyairflowpressure", async (req, res) => {
         data.forEach(element => {
             let lookUpFanObj = _.filter(dia, function(o) { return o.fan_diameter == element.mm; });
             let _elem = {
+                uuid: uuidv4(),
                 ...element,
                 ...lookUpFanObj[0]
             };
@@ -1160,7 +1180,7 @@ app.get("/api/motors", async (req, res) => {
 app.get("/api/motor/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const motor = await pool.query("SELECT * FROM lookup_motors WHERE id = $1 order by id", [id]);
+        const motor = await pool.query("SELECT * FROM lookup_motors WHERE motor_id = $1 order by motor_id", [id]);
         if (motor.rows.length > 0) {
             responseObj = {
                 "is_success": true,
@@ -1191,9 +1211,9 @@ app.get("/api/motor/:id", async (req, res) => {
 app.post("/api/motor/create", async (req, res) => {
     try {
         const { motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,created_by } = req.body;
-        let id = await common.generate_motor_id();
-        const motor = await pool.query("INSERT into lookup_motors (id,motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,created_by,created_date) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28) RETURNING *",
-            [id,motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,created_by,new Date()]);
+        let motor_id = await common.generate_motor_id();
+        const motor = await pool.query("INSERT into lookup_motors (motor_id,motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,created_by,created_date) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28) RETURNING *",
+            [motor_id,motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,created_by,new Date()]);
 
         responseObj = {
             "is_success": true,
@@ -1216,10 +1236,10 @@ app.post("/api/motor/create", async (req, res) => {
 //update a motor
 app.put("/api/motor/edit", async (req, res) => {
     try {
-        const { motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,updated_by,id } = req.body;
+        const { motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,updated_by,motor_id } = req.body;
 
-        const motor_update = await pool.query("UPDATE lookup_motors SET motor_make = $1, classification = $2, ambient_temperature = $3,ip_rating = $4,motor_poles = $5, frame_size = $6, insulation_class = $7, temperature_rise = $8, efficiency_class = $9, rated_power = $10, rated_voltage = $11,        rated_motor_frequency = $12, motor_model = $13, rated_speed = $14, efficiency_100 = $15,         efficiency_75 = $16, efficiency_50 = $17, power_factor = $18, rated_current_ina = $19, rated_current_isin = $20, torque_nm = $21, torque_tstn = $22, torque_tbtn = $23, moment_of_inertia = $24, weight = $25, updated_by = $26, updated_date = $27 WHERE id = $28 RETURNING *",
-            [motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,updated_by,new Date(), id]);
+        const motor_update = await pool.query("UPDATE lookup_motors SET motor_make = $1, classification = $2, ambient_temperature = $3,ip_rating = $4,motor_poles = $5, frame_size = $6, insulation_class = $7, temperature_rise = $8, efficiency_class = $9, rated_power = $10, rated_voltage = $11, rated_motor_frequency = $12, motor_model = $13, rated_speed = $14, efficiency_100 = $15, efficiency_75 = $16, efficiency_50 = $17, power_factor = $18, rated_current_ina = $19, rated_current_isin = $20, torque_nm = $21, torque_tstn = $22, torque_tbtn = $23, moment_of_inertia = $24, weight = $25, updated_by = $26, updated_date = $27 WHERE motor_id = $28 RETURNING *",
+            [motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,updated_by,new Date(), motor_id]);
 
         responseObj = {
             "is_success": true,
