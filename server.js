@@ -543,7 +543,7 @@ app.get("/api/project/units/:id", async (req, res) => {
         let query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,
         pu.pu_no, pu.airflow, pu.pressure, pu.pressure_type, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, aluc.unit as airflow_unit, pluc.unit as pressure_unit
             from project_units pu left join lookup_unit_conversion aluc on aluc.luc_id = pu.airflow_luc_id
-            left join lookup_unit_conversion pluc on pluc.luc_id = pu.pressure_luc_id where pu.proj_id = $1`
+            left join lookup_unit_conversion pluc on pluc.luc_id = pu.pressure_luc_id where pu.proj_id = $1 and pu.is_delete=0 order by created_date asc`
         const unit = await pool.query(query, [id]);
         if (unit.rows.length > 0) {
             responseObj = {
@@ -1207,6 +1207,7 @@ app.get("/api/motor/:id", async (req, res) => {
         res.json(responseObj);
     }
 });
+
 //create motor
 app.post("/api/motor/create", async (req, res) => {
     try {
@@ -1283,3 +1284,40 @@ app.get("/api/motor/delete/:id", async (req, res) => {
     }
 });
 
+//_____________________________Motor_API_END___________________________________________________
+
+//_____________________________Save_Unit_Fans__________________________________________________
+//create motor
+app.post("/api/selected_fan_data/create", async (req, res) => {
+    try {
+        const { diameter, angle, air_flow, pressure, fan_velocity, velocity_pressure, static_pressure, fan_speed, power, power_vfd, total_efficiency, total_static_efficiency, total_pressure, static_pressure_prts, lpa, lp, lwat, lwt, lwai, lwi, max_torque_required, total_efficiency_percentage, static_pressure_percentage, inlet_sound_power_level, outlet_sound_power_level, sound_pressure_level, breakout_sound_power_level, breakout_sound_pressure_level, specific_fan_power, motor_id, created_by, pu_id } = req.body;
+        
+        let unit_fan_id = uuidv4();
+        const motor = await pool.query("INSERT into unit_fans (diameter, angle, air_flow, pressure, fan_velocity, velocity_pressure, static_pressure, fan_speed, power, power_vfd, total_efficiency, total_static_efficiency, total_pressure, static_pressure_prts, lpa, lp, lwat, lwt, lwai, lwi, max_torque_required, total_efficiency_percentage, static_pressure_percentage, inlet_sound_power_level, outlet_sound_power_level, sound_pressure_level, breakout_sound_power_level, breakout_sound_pressure_level, specific_fan_power, motor_id, created_by, created_date, pu_id, unit_fan_id) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34) RETURNING *",
+            [diameter, angle, air_flow, pressure, fan_velocity, velocity_pressure, static_pressure, fan_speed, power, power_vfd, total_efficiency, total_static_efficiency, total_pressure, static_pressure_prts, lpa, lp, lwat, lwt, lwai, lwi, max_torque_required, total_efficiency_percentage, static_pressure_percentage, inlet_sound_power_level, outlet_sound_power_level, sound_pressure_level, breakout_sound_power_level, breakout_sound_pressure_level, specific_fan_power, motor_id, created_by,new Date(), pu_id, unit_fan_id]);
+   
+        let unit_fan_id_status = await common.getselectedfansofprojectunit(pu_id);
+
+        if(unit_fan_id_status == null || unit_fan_id_status == '')
+        {
+            await common.setfanfromselectedfans(pu_id, unit_fan_id);
+        }
+
+        responseObj = {
+            "is_success": true,
+            "message": "Selected Fan data has been created",
+            "data": motor.rows
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    } 
+});
+//_____________________________Save_Unit_Fans_END_________________________________________________

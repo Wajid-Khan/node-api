@@ -157,4 +157,22 @@ const zeroPad = (num, places) => String(num).padStart(places, '0');
       })
    }
 
-module.exports = { generate_emp_no, generate_comp_no, generate_branch_no, generate_proj_no, generate_pu_no, check_pu_name, generate_pdf, generate_motor_id}
+   function getselectedfansofprojectunit (pu_id) {
+    let q = "select unit_fan_id from project_units where pu_id ='" + pu_id + "'";
+    return new Promise((resolve, reject) => {
+        pool.query(q, (err, res) => {
+          err ? reject(err) : resolve(res.rows[0]?.unit_fan_id);
+        })
+      })
+   }
+
+   function setfanfromselectedfans(pu_id, unit_fan_id) {
+    let q = "UPDATE project_units SET unit_fan_id = '"+ unit_fan_id +"' where pu_id = '" + pu_id + "'";
+    return new Promise((resolve, reject) => {
+        pool.query(q, (err, res) => {
+          err ? reject(err) : resolve(res.rows);
+        })
+      })
+   }
+
+module.exports = { generate_emp_no, generate_comp_no, generate_branch_no, generate_proj_no, generate_pu_no, check_pu_name, generate_pdf, generate_motor_id, getselectedfansofprojectunit, setfanfromselectedfans}
