@@ -1,7 +1,7 @@
 const pool = require("./db");
 const fs = require("fs");
 const path = require("path");
-const pdf = require("pdf-creator-node");
+
 const zeroPad = (num, places) => String(num).padStart(places, '0');
 
   function generate_emp_no () {
