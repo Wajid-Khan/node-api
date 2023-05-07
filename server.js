@@ -608,7 +608,7 @@ app.get("/api/unitdata/:id", async (req, res) => {
 app.get("/api/unit/selectedfans/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        let query = `select * from unit_fans where pu_id = $1`;
+        let query = `select * from unit_fans where pu_id = $1 order by created_date`;
         const unit = await pool.query(query, [id]);
         if (unit.rows.length > 0) {
             responseObj = {
@@ -1356,7 +1356,7 @@ app.post("/api/selected_fan_data/create", async (req, res) => {
     } 
 });
 
-//update a employee
+
 app.put("/api/setfanfromselectedfans", async (req, res) => {
     try {
         const { pu_id, unit_fan_id, fan_selected_by } = req.body;
@@ -1381,4 +1381,30 @@ app.put("/api/setfanfromselectedfans", async (req, res) => {
         res.json(responseObj);
     }
 });
+
+app.put("/api/unitfan/updatemotorforfan", async (req, res) => {
+    try {
+        const { unit_fan_id, motor_id, updated_by } = req.body;
+
+        const update = await pool.query("UPDATE unit_fans SET motor_id = $2, updated_by=$3, updated_date=$4 WHERE unit_fan_id = $1 RETURNING *",
+            [unit_fan_id, motor_id, updated_by, new Date()]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "This motor has been selected",
+            "data": update.rows
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 //_____________________________Save_Unit_Fans_END_________________________________________________
