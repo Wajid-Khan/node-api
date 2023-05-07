@@ -166,8 +166,8 @@ const zeroPad = (num, places) => String(num).padStart(places, '0');
       })
    }
 
-   function setfanfromselectedfans(pu_id, unit_fan_id) {
-    let q = "UPDATE project_units SET unit_fan_id = '"+ unit_fan_id +"' where pu_id = '" + pu_id + "'";
+   function setfanfromselectedfans(pu_id, unit_fan_id,fan_selected_by, fan_selected_date) {
+    let q = "UPDATE project_units SET unit_fan_id = '"+ unit_fan_id +"', fan_selected_by = '" +fan_selected_by + "', fan_selected_date = '" + fan_selected_date +"' where pu_id = '" + pu_id + "'";
     return new Promise((resolve, reject) => {
         pool.query(q, (err, res) => {
           err ? reject(err) : resolve(res.rows);

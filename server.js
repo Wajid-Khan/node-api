@@ -576,7 +576,7 @@ app.get("/api/project/units/:id", async (req, res) => {
 app.get("/api/unitdata/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        let query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,pu.pu_no, pu.airflow, pu.pressure, pu.pressure_type, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, com.com_id, com.com_name, cb.cb_id, cb.com_branch_name, pro.proj_id, pro.proj_name from project_units pu inner join projects pro on pu.proj_id = pro.proj_id inner join companies com on pu.com_id = com.com_id inner join company_branches cb on pu.cb_id = cb.cb_id where pu.pu_id = $1`;
+        let query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,pu.pu_no, pu.airflow, pu.pressure, pu.pressure_type, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, com.com_id, com.com_name, cb.cb_id, cb.com_branch_name, pro.proj_id, pro.proj_name, pu.unit_fan_id, pu.fan_selected_by, pu.fan_selected_date from project_units pu inner join projects pro on pu.proj_id = pro.proj_id inner join companies com on pu.com_id = com.com_id inner join company_branches cb on pu.cb_id = cb.cb_id where pu.pu_id = $1`;
         const unit = await pool.query(query, [id]);
         if (unit.rows.length > 0) {
             responseObj = {
@@ -604,6 +604,39 @@ app.get("/api/unitdata/:id", async (req, res) => {
         res.json(responseObj);
     }
 });
+
+app.get("/api/unit/selectedfans/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        let query = `select * from unit_fans where pu_id = $1`;
+        const unit = await pool.query(query, [id]);
+        if (unit.rows.length > 0) {
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": unit.rows
+            };
+        }
+        else {
+            responseObj = {
+                "is_success": false,
+                "message": "No record(s) found",
+                "data": []
+            };
+        }
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 
 //create a company unit
 app.post("/api/unit/create", async (req, res) => {
@@ -1300,7 +1333,9 @@ app.post("/api/selected_fan_data/create", async (req, res) => {
 
         if(unit_fan_id_status == null || unit_fan_id_status == '')
         {
-            await common.setfanfromselectedfans(pu_id, unit_fan_id);
+            //await common.setfanfromselectedfans(pu_id, unit_fan_id,created_by,new Date());
+            const update = await pool.query("UPDATE project_units SET unit_fan_id = $2, fan_selected_by=$3, fan_selected_date=$4 WHERE pu_id = $1 RETURNING *",
+            [pu_id, unit_fan_id, created_by, new Date()]);
         }
 
         responseObj = {
@@ -1319,5 +1354,31 @@ app.post("/api/selected_fan_data/create", async (req, res) => {
         };
         res.json(responseObj);
     } 
+});
+
+//update a employee
+app.put("/api/setfanfromselectedfans", async (req, res) => {
+    try {
+        const { pu_id, unit_fan_id, fan_selected_by } = req.body;
+
+        const update = await pool.query("UPDATE project_units SET unit_fan_id = $2, fan_selected_by=$3, fan_selected_date=$4 WHERE pu_id = $1 RETURNING *",
+            [pu_id, unit_fan_id, fan_selected_by, new Date()]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "This fan has been selected",
+            "data": update.rows
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
 });
 //_____________________________Save_Unit_Fans_END_________________________________________________
