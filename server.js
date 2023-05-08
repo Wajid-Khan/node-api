@@ -11,7 +11,7 @@ const { createPdf } = require("./pdf.js");
 const fanData = require("./files/fansdata");
 const _ = require("lodash");
 const fetch = require("node-fetch");
-const fandata_api_url = "http://3.109.124.68/";
+const fandata_api_url = "http://3.109.124.68/"; //"http://localhost:3007/";
 //Port
 const port = process.env.PORT || 3007;
 app.listen(port, () => {
@@ -1130,18 +1130,18 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
             url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}`;
         }
         else if(fancriteria == "apd"){
-            url = `${fandata_api_url}getrecordsbydiameter?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}`;
+            url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}`;
         }
         else if(fancriteria == "apda"){
-            url = `${fandata_api_url}getrecordsbyanglediameter?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&angle=${angle}`;
+            url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&angle=${angle}`;
         }
         else if(fancriteria == "apdr"){
-            url = `${fandata_api_url}getrecordsbydiameterrange?airflow=${airflow}&pressure=${pressure}&start=${fan_start_diameter}&end=${fan_end_diameter}`;
+            url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}&start=${fan_start_diameter}&end=${fan_end_diameter}`;
         }
         else{
-            url = `${fandata_api_url}getrecordsbyanglediameter?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&start=${start_angle}&end=${end_angle}`;
+            url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&start=${start_angle}&end=${end_angle}`;
         }
-        console.log(url);
+        //console.log(url);
         //url = `${fandata_api_url}files/fansdata.json`;
         const response = await fetch(url);
         if(response?.status == 200){
@@ -1167,7 +1167,6 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
             };
         }
         else{
-            console.log(1);
             responseObj = {
                 "is_success": false,
                 "message": "Something went wrong, please try again later",
