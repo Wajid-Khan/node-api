@@ -11,7 +11,7 @@ const { createPdf } = require("./pdf.js");
 const fanData = require("./files/fansdata");
 const _ = require("lodash");
 const fetch = require("node-fetch");
-const fandata_api_url = "http://localhost:3007/"; //"http://3.109.124.68/";
+const fandata_api_url = "http://3.109.124.68/";
 //Port
 const port = process.env.PORT || 3007;
 app.listen(port, () => {
@@ -1142,28 +1142,39 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
             url = `${fandata_api_url}getrecordsbyanglediameter?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&start=${start_angle}&end=${end_angle}`;
         }
         console.log(url);
-        url = `${fandata_api_url}files/fansdata.json`;
+        //url = `${fandata_api_url}files/fansdata.json`;
         const response = await fetch(url);
-        const data = await response.json(); 
-        const mmArr = _.map(data, 'mm')
-        const mmString = mmArr.toString();
-        const unit = await pool.query(`SELECT * FROM lookup_fans where fan_diameter IN (${mmString}) `);
-        const dia = unit.rows;
-        var finalObj = [];
-        data.forEach(element => {
-            let lookUpFanObj = _.filter(dia, function(o) { return o.fan_diameter == element.mm; });
-            let _elem = {
-                uuid: uuidv4(),
-                ...element,
-                ...lookUpFanObj[0]
+        if(response?.status == 200){
+            const data = await response.json(); 
+            const mmArr = _.map(data, 'mm')
+            const mmString = mmArr.toString();
+            const unit = await pool.query(`SELECT * FROM lookup_fans where fan_diameter IN (${mmString}) `);
+            const dia = unit.rows;
+            var finalObj = [];
+            data.forEach(element => {
+                let lookUpFanObj = _.filter(dia, function(o) { return o.fan_diameter == element.mm; });
+                let _elem = {
+                    uuid: uuidv4(),
+                    ...element,
+                    ...lookUpFanObj[0]
+                };
+                finalObj.push(_elem);
+            });
+            responseObj = {
+                "is_success": true,
+                "message": "",
+                "data": finalObj
             };
-            finalObj.push(_elem);
-        });
-        responseObj = {
-            "is_success": true,
-            "message": "",
-            "data": finalObj
-        };
+        }
+        else{
+            console.log(1);
+            responseObj = {
+                "is_success": false,
+                "message": "Something went wrong, please try again later",
+                "data": []
+            };
+        }
+
     } catch (err) {
         responseObj = {
             "is_success": false,
@@ -1181,7 +1192,7 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
 app.get("/api/motors", async (req, res) => {
     try {
         const { size, page, sortField, sortOrder } = req.query;
-        let query = 'Select * from lookup_motors where is_delete = 0 order by created_date desc';
+        let query = 'Select * from lookup_motors where is_delete = 0 order by motor_id';
         if (sortField) {
             query += `  order by ${sortField} ${sortOrder == 'ascend' ? `asc` : `desc`}`
         }
