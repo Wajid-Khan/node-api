@@ -5,13 +5,19 @@ const pool = require("./db");
 const { v4: uuidv4 } = require('uuid');
 const crypto = require("./crypto");
 const common = require("./common");
-const fs = require("fs");
+//const fs = require("fs");
 const PDFDocument = require('pdfkit');
 const { createPdf } = require("./pdf.js");
 const fanData = require("./files/fansdata");
 const _ = require("lodash");
 const fetch = require("node-fetch");
 const fandata_api_url = "http://3.109.124.68/"; //"http://localhost:3007/";
+
+const puppeteer = require('puppeteer');
+const handlebars = require('handlebars');
+const fs = require('fs');
+
+
 //Port
 const port = process.env.PORT || 3007;
 app.listen(port, () => {
@@ -541,9 +547,11 @@ app.get("/api/project/units/:id", async (req, res) => {
     try {
         const { id } = req.params;
         let query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,
-        pu.pu_no, pu.airflow, pu.pressure, pu.pressure_type, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, aluc.unit as airflow_unit, pluc.unit as pressure_unit
+        pu.pu_no, pu.airflow, pu.pressure, pu.pressure_type, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, aluc.unit as airflow_unit, pluc.unit as pressure_unit, pu.unit_fan_id, uf.motor_id
             from project_units pu left join lookup_unit_conversion aluc on aluc.luc_id = pu.airflow_luc_id
-            left join lookup_unit_conversion pluc on pluc.luc_id = pu.pressure_luc_id where pu.proj_id = $1 and pu.is_delete=0 order by created_date asc`
+            left join lookup_unit_conversion pluc on pluc.luc_id = pu.pressure_luc_id 
+            left join unit_fans uf on uf.unit_fan_id = pu.unit_fan_id
+            where pu.proj_id = $1 and pu.is_delete=0 order by created_date asc`
         const unit = await pool.query(query, [id]);
         if (unit.rows.length > 0) {
             responseObj = {
@@ -689,7 +697,7 @@ app.post("/api/unit/create/bulk", async (req, res) => {
             };
             res.json(responseObj);
         }
-        else{
+        else {
             for (const i in units) {
                 units[i].pu_id = uuidv4();
                 units[i].pu_no = await common.generate_pu_no(units[i].proj_id);
@@ -1105,13 +1113,13 @@ app.get('/api/generate_employee_pdf/:id', async (req, resp) => {
 
 });
 
-app.get("/api/pdf", async (req, res) => {
-    const id = 'ea30c144-f60a-4bd5-a7be-acf2c2aa271b';
-    const employee = await pool.query("SELECT * FROM employees WHERE emp_id = $1", [id]);
-    createPdf(employee.rows[0], `pdf-files/${id}.pdf`);
-    res.json("pdf created");
+// app.get("/api/pdf", async (req, res) => {
+//     const id = 'ea30c144-f60a-4bd5-a7be-acf2c2aa271b';
+//     const employee = await pool.query("SELECT * FROM employees WHERE emp_id = $1", [id]);
+//     createPdf(employee.rows[0], `pdf-files/${id}.pdf`);
+//     res.json("pdf created");
 
-} );
+// });
 
 app.use(express.static('public'));
 app.use('/pdf-files', express.static(__dirname + '/pdf-files'));
@@ -1125,34 +1133,34 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
         // http://3.109.124.68/getrecordsbyairflowpressure?airflow=50000&pressure=490
         let url = "";
         const { fancriteria, airflow, pressure, fan_diameter, angle, fan_start_diameter, fan_end_diameter, start_angle, end_angle } = req.body;
-        
-        if(fancriteria == "ap"){
+
+        if (fancriteria == "ap") {
             url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}`;
         }
-        else if(fancriteria == "apd"){
+        else if (fancriteria == "apd") {
             url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}`;
         }
-        else if(fancriteria == "apda"){
+        else if (fancriteria == "apda") {
             url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&angle=${angle}`;
         }
-        else if(fancriteria == "apdr"){
+        else if (fancriteria == "apdr") {
             url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}&start=${fan_start_diameter}&end=${fan_end_diameter}`;
         }
-        else{
+        else {
             url = `${fandata_api_url}getrecordsbyairflowpressure?airflow=${airflow}&pressure=${pressure}&diameter=${fan_diameter}&start=${start_angle}&end=${end_angle}`;
         }
         //console.log(url);
         //url = `${fandata_api_url}files/fansdata.json`;
         const response = await fetch(url);
-        if(response?.status == 200){
-            const data = await response.json(); 
+        if (response?.status == 200) {
+            const data = await response.json();
             const mmArr = _.map(data, 'mm')
             const mmString = mmArr.toString();
             const unit = await pool.query(`SELECT * FROM lookup_fans where fan_diameter IN (${mmString}) `);
             const dia = unit.rows;
             var finalObj = [];
             data.forEach(element => {
-                let lookUpFanObj = _.filter(dia, function(o) { return o.fan_diameter == element.mm; });
+                let lookUpFanObj = _.filter(dia, function (o) { return o.fan_diameter == element.mm; });
                 let _elem = {
                     uuid: uuidv4(),
                     ...element,
@@ -1166,7 +1174,7 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
                 "data": finalObj
             };
         }
-        else{
+        else {
             responseObj = {
                 "is_success": false,
                 "message": "Something went wrong, please try again later",
@@ -1183,7 +1191,7 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
         res.json(responseObj);
     }
     res.json(responseObj);
-    
+
 });
 // _______________Api_call__________________ \\
 
@@ -1254,10 +1262,10 @@ app.get("/api/motor/:id", async (req, res) => {
 //create motor
 app.post("/api/motor/create", async (req, res) => {
     try {
-        const { motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,created_by } = req.body;
+        const { motor_make, classification, ambient_temperature, ip_rating, motor_poles, frame_size, insulation_class, temperature_rise, efficiency_class, rated_power, rated_voltage, rated_motor_frequency, motor_model, rated_speed, efficiency_100, efficiency_75, efficiency_50, power_factor, rated_current_ina, rated_current_isin, torque_nm, torque_tstn, torque_tbtn, moment_of_inertia, weight, created_by } = req.body;
         let motor_id = await common.generate_motor_id();
         const motor = await pool.query("INSERT into lookup_motors (motor_id,motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,created_by,created_date) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28) RETURNING *",
-            [motor_id,motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,created_by,new Date()]);
+            [motor_id, motor_make, classification, ambient_temperature, ip_rating, motor_poles, frame_size, insulation_class, temperature_rise, efficiency_class, rated_power, rated_voltage, rated_motor_frequency, motor_model, rated_speed, efficiency_100, efficiency_75, efficiency_50, power_factor, rated_current_ina, rated_current_isin, torque_nm, torque_tstn, torque_tbtn, moment_of_inertia, weight, created_by, new Date()]);
 
         responseObj = {
             "is_success": true,
@@ -1280,10 +1288,10 @@ app.post("/api/motor/create", async (req, res) => {
 //update a motor
 app.put("/api/motor/edit", async (req, res) => {
     try {
-        const { motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,updated_by,motor_id } = req.body;
+        const { motor_make, classification, ambient_temperature, ip_rating, motor_poles, frame_size, insulation_class, temperature_rise, efficiency_class, rated_power, rated_voltage, rated_motor_frequency, motor_model, rated_speed, efficiency_100, efficiency_75, efficiency_50, power_factor, rated_current_ina, rated_current_isin, torque_nm, torque_tstn, torque_tbtn, moment_of_inertia, weight, updated_by, motor_id } = req.body;
 
         const motor_update = await pool.query("UPDATE lookup_motors SET motor_make = $1, classification = $2, ambient_temperature = $3,ip_rating = $4,motor_poles = $5, frame_size = $6, insulation_class = $7, temperature_rise = $8, efficiency_class = $9, rated_power = $10, rated_voltage = $11, rated_motor_frequency = $12, motor_model = $13, rated_speed = $14, efficiency_100 = $15, efficiency_75 = $16, efficiency_50 = $17, power_factor = $18, rated_current_ina = $19, rated_current_isin = $20, torque_nm = $21, torque_tstn = $22, torque_tbtn = $23, moment_of_inertia = $24, weight = $25, updated_by = $26, updated_date = $27 WHERE motor_id = $28 RETURNING *",
-            [motor_make,classification,ambient_temperature,ip_rating,motor_poles,frame_size,insulation_class,temperature_rise,efficiency_class,rated_power,rated_voltage,rated_motor_frequency,motor_model,rated_speed,efficiency_100,efficiency_75,efficiency_50,power_factor,rated_current_ina,rated_current_isin,torque_nm,torque_tstn,torque_tbtn,moment_of_inertia,weight,updated_by,new Date(), motor_id]);
+            [motor_make, classification, ambient_temperature, ip_rating, motor_poles, frame_size, insulation_class, temperature_rise, efficiency_class, rated_power, rated_voltage, rated_motor_frequency, motor_model, rated_speed, efficiency_100, efficiency_75, efficiency_50, power_factor, rated_current_ina, rated_current_isin, torque_nm, torque_tstn, torque_tbtn, moment_of_inertia, weight, updated_by, new Date(), motor_id]);
 
         responseObj = {
             "is_success": true,
@@ -1334,18 +1342,17 @@ app.get("/api/motor/delete/:id", async (req, res) => {
 app.post("/api/selected_fan_data/create", async (req, res) => {
     try {
         const { diameter, angle, air_flow, pressure, fan_velocity, velocity_pressure, static_pressure, fan_speed, power, power_vfd, total_efficiency, total_static_efficiency, total_pressure, static_pressure_prts, lpa, lp, lwat, lwt, lwai, lwi, max_torque_required, total_efficiency_percentage, static_pressure_percentage, inlet_sound_power_level, outlet_sound_power_level, sound_pressure_level, breakout_sound_power_level, breakout_sound_pressure_level, specific_fan_power, motor_id, created_by, pu_id } = req.body;
-        
+
         let unit_fan_id = uuidv4();
         const motor = await pool.query("INSERT into unit_fans (diameter, angle, air_flow, pressure, fan_velocity, velocity_pressure, static_pressure, fan_speed, power, power_vfd, total_efficiency, total_static_efficiency, total_pressure, static_pressure_prts, lpa, lp, lwat, lwt, lwai, lwi, max_torque_required, total_efficiency_percentage, static_pressure_percentage, inlet_sound_power_level, outlet_sound_power_level, sound_pressure_level, breakout_sound_power_level, breakout_sound_pressure_level, specific_fan_power, motor_id, created_by, created_date, pu_id, unit_fan_id) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34) RETURNING *",
-            [diameter, angle, air_flow, pressure, fan_velocity, velocity_pressure, static_pressure, fan_speed, power, power_vfd, total_efficiency, total_static_efficiency, total_pressure, static_pressure_prts, lpa, lp, lwat, lwt, lwai, lwi, max_torque_required, total_efficiency_percentage, static_pressure_percentage, inlet_sound_power_level, outlet_sound_power_level, sound_pressure_level, breakout_sound_power_level, breakout_sound_pressure_level, specific_fan_power, motor_id, created_by,new Date(), pu_id, unit_fan_id]);
-   
+            [diameter, angle, air_flow, pressure, fan_velocity, velocity_pressure, static_pressure, fan_speed, power, power_vfd, total_efficiency, total_static_efficiency, total_pressure, static_pressure_prts, lpa, lp, lwat, lwt, lwai, lwi, max_torque_required, total_efficiency_percentage, static_pressure_percentage, inlet_sound_power_level, outlet_sound_power_level, sound_pressure_level, breakout_sound_power_level, breakout_sound_pressure_level, specific_fan_power, motor_id, created_by, new Date(), pu_id, unit_fan_id]);
+
         let unit_fan_id_status = await common.getselectedfansofprojectunit(pu_id);
 
-        if(unit_fan_id_status == null || unit_fan_id_status == '')
-        {
+        if (unit_fan_id_status == null || unit_fan_id_status == '') {
             //await common.setfanfromselectedfans(pu_id, unit_fan_id,created_by,new Date());
             const update = await pool.query("UPDATE project_units SET unit_fan_id = $2, fan_selected_by=$3, fan_selected_date=$4 WHERE pu_id = $1 RETURNING *",
-            [pu_id, unit_fan_id, created_by, new Date()]);
+                [pu_id, unit_fan_id, created_by, new Date()]);
         }
 
         responseObj = {
@@ -1363,7 +1370,7 @@ app.post("/api/selected_fan_data/create", async (req, res) => {
             "data": null
         };
         res.json(responseObj);
-    } 
+    }
 });
 
 
@@ -1418,3 +1425,113 @@ app.put("/api/unitfan/updatemotorforfan", async (req, res) => {
 });
 
 //_____________________________Save_Unit_Fans_END_________________________________________________
+async function generatePDF(data) {
+    // Read the HTML template
+    const template = fs.readFileSync('fandatasheet.html', 'utf-8');
+  
+    // Compile the template with Handlebars
+    const compiledTemplate = handlebars.compile(template);
+  
+    // Replace placeholders with actual data
+    const html = compiledTemplate(data);
+  
+    // Launch Puppeteer and generate PDF
+    //const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({headless: true, args: ['--no-sandbox']})
+    const page = await browser.newPage();
+    await page.setContent(html);
+    const pdf = await page.pdf({ format: 'A4' });
+  
+    // Save the PDF to a file
+    fs.writeFileSync(`pdf-files/${data?.id}.pdf`, pdf);
+  
+    // Close the browser
+    await browser.close();
+  }
+
+
+    app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
+
+        try {
+        const { pu_id } = req.params;
+
+        let _query = `select pu.pu_id, pu.proj_id, pu.unit_name, pu.is_delete, pu.created_by, pu.created_date, pu.updated_by, pu.updated_date,
+        pu.pu_no, pu.airflow, pu.pressure, pu.pressure_type, pu.cb_id, pu.com_id, pu.airflow_luc_id, pu.pressure_luc_id, aluc.unit as airflow_unit, pluc.unit as pressure_unit,
+         pu.unit_fan_id, uf.motor_id
+            from project_units pu left join lookup_unit_conversion aluc on aluc.luc_id = pu.airflow_luc_id
+            left join lookup_unit_conversion pluc on pluc.luc_id = pu.pressure_luc_id 
+            left join unit_fans uf on uf.unit_fan_id = pu.unit_fan_id
+            where pu.pu_id = $1`
+            
+        const project_unit = await pool.query(_query, [pu_id]);
+       
+        if (project_unit.rows.length > 0) {
+            const unit_fan = await pool.query("select * from unit_fans where unit_fan_id = $1", [project_unit.rows[0]?.unit_fan_id]);
+           
+            if (unit_fan.rows.length > 0) {
+                const motor = await pool.query("select * from lookup_motors where motor_id = $1", [unit_fan.rows[0]?.motor_id]);
+                if (motor.rows.length > 0) {
+                    let query = `select p.proj_id, p.proj_name, p.created_date, p.proj_no, p.cb_id, p.com_id, c.com_no, c.com_name,cb.cb_no, cb.com_branch_name
+                    from projects p 
+                    left join companies c on p.com_id = c.com_id
+                    left join company_branches cb on p.cb_id = cb.cb_id
+                    where p.proj_id = $1`
+                    const project = await pool.query(query, [project_unit.rows[0]?.proj_id]);
+                    
+                    if (project.rows.length > 0) {
+                        let url = `${fandata_api_url}plotgraph?diameter=${unit_fan.rows[0]?.diameter}&airflow=${project_unit.rows[0]?.airflow}&pressure=${project_unit.rows[0]?.pressure}`;
+                        const response = await fetch(url);
+                        if (response?.status == 200) {
+                            const imageBase64 = await response.text();
+                            const currentDate = new Date();
+                            const formattedDate = currentDate.toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                            });
+                            const data = {
+                                id:project_unit.rows[0]?.pu_no,
+                                com_name: project.rows[0]?.com_name,
+                                proj_name: project.rows[0]?.proj_name,
+                                com_branch_name: project.rows[0]?.com_branch_name,
+                                unit_name: project_unit.rows[0]?.unit_name,
+                                airflow: project_unit.rows[0]?.airflow,
+                                airflow_unit:project_unit.rows[0]?.airflow_unit,
+                                pressure: project_unit.rows[0]?.pressure,
+                                pressure_unit: project_unit.rows[0]?.pressure_unit,
+                                graph: `data:image/png;base64,${imageBase64}`,
+                                date: formattedDate,
+                              };
+                            generatePDF(data)
+                            .then(() => {
+                                responseObj = {
+                                    "is_success": true,
+                                    "message": "Generate PDF",
+                                    "data": req.protocol + '://' + req.get('host') + '/' + `pdf-files/${data?.id}.pdf`
+                                };
+                                res.json(responseObj);
+                            })
+                            .catch((error) => {
+                              //console.error('Error generating PDF:', error);
+                              responseObj = {
+                                "is_success": false,
+                                "message": error,
+                                "data": data
+                            };
+                            res.json(responseObj);
+                            });
+                        }
+                    }
+                    
+                }
+            }
+        }
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+    });
