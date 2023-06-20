@@ -12,6 +12,7 @@ const fanData = require("./files/fansdata");
 const _ = require("lodash");
 const fetch = require("node-fetch");
 const fandata_api_url = "http://3.109.124.68/"; //"http://localhost:3007/";
+const plotgraph = "http://3.109.124.68/plotgraph";
 
 const puppeteer = require('puppeteer');
 const handlebars = require('handlebars');
@@ -1535,3 +1536,57 @@ async function generatePDF(data) {
         res.json(responseObj);
     }
     });
+
+    async function updateBase64Data({ pressure, airflow, diameter, base64 }){
+        await pool.query("INSERT INTO base64data (airflow, diameter, pressure, base64) VALUES($1, $2, $3, $4)",
+        [airflow, diameter, pressure, base64]);
+    }
+
+    app.put("/api/generateorfetchfandatasheet", async (req, res) => {
+        try {
+            const { pressure, airflow, diameter } = req.body;
+            const base64 = await pool.query("Select * from base64data WHERE pressure = $1 and airflow = $2 and diameter = $3 ", [pressure, airflow, diameter]);
+            if(base64.rows[0] != undefined)
+            {
+                responseObj = {
+                    "is_success": true,
+                    "message": '',
+                    "data": base64.rows[0].base64
+                };
+                res.json(responseObj);
+            }
+            else
+            {
+                const url = `${plotgraph}?diameter=${diameter}&airflow=${airflow}&pressure=${pressure}`;
+                const response = await fetch(url);
+                if (response?.status == 200) {
+                    const imageBase64 = await response.text();
+                    const GeneratedBase64Image = `data:image/png;base64,${imageBase64}`;
+                    const base64_Data = {
+                        pressure: pressure,
+                        airflow: airflow,
+                        diameter: diameter,
+                        base64 : GeneratedBase64Image
+                      };
+                    await updateBase64Data(base64_Data);
+                    responseObj = {
+                        "is_success": true,
+                        "message": '',
+                        "data": GeneratedBase64Image
+                    };
+                }
+            
+                res.json(responseObj);
+            }
+
+
+        } catch (err) {
+            responseObj = {
+                "is_success": false,
+                "message": err.message,
+                "data": null
+            };
+            res.json(responseObj);
+        }
+
+    } );
