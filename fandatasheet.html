@@ -1,803 +1,735 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <style>
-        page[size="A4"] {
-            background: #fff;
-            width: 210mm;
-            height: 300mm;
-            display: block;
-            margin: 0 auto;
-            margin-bottom: 0.5cm;
-
-            font-family: 'Mallory', Arial, Verdana, Sans-serif;
-        }
-
-        page {
-            background: #fff;
-            display: block;
-            margin: 0 auto;
-            margin-bottom: 5mm;
-            margin-top: 5mm;
-            padding: 14px;
-        }
-
-        page[size="A4"] {
-            width: 210mm;
-            height: 300mm;
-        }
-
-        @page {
-            size: 210mm 297mm;
-            margin: 10mm;
-        }
-
-        footer {
-            font-size: 9px;
-
-            text-align: center;
-        }
-
-        footer div p {
-            font-size: 14px;
-        }
-
-        footer {
-            position: relative;
-            right: 0;
-            width: 210mm;
-            left: 0;
-            margin: 0 auto;
-
-
-        }
-    </style>
-</head>
-
-<body>
-    <div>
-        <page size="A4">
-            <div style="min-height: 272mm;">
-                <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;display: flex;
-    justify-content: space-between;">
-                    <h1 style="margin-bottom: 0;">Fan Data Sheet
-
-                    </h1>
-
-                    <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="250"
-                        height="auto" />
-
-                </div>
-                <header
-                    style="padding: 15px 25px; border-bottom: 1px solid #ccc;background-color: white;text-align: center;">
-
-                </header>
-                <content>
-
-                    <div id="block" style="background-color: #fff;    border-top: 3px solid #ccc;
-    border-bottom: 3px solid #ccc; padding: 15px;display: flex;    margin-bottom: 20px;
-">
-                        <table width="50%">
-                            <tr>
-                                <td>Customer</td>
-                                <td>{{com_name}}</td>
-                            </tr>
-                            <tr>
-                                <td>Project</td>
-                                <td>{{proj_name}}</td>
-                            </tr>
-                            <tr>
-                                <td>Design Parameter</td>
-                                <td> {{airflow}}{{airflow_unit}} @ {{pressure}}{{pressure_unit}} </td>
-                            </tr>
-                        </table>
-                        <table width="50%">
-                            <tr>
-                                <td>Branch</td>
-                                <td>{{com_branch_name}}</td>
-                            </tr>
-                            <tr>
-                                <td>Unit Name</td>
-                                <td>{{unit_name}}</td>
-                            </tr>
-                            <tr>
-                                <td>Date</td>
-                                <td>{{date}}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div style="">
-                        <div id="block"
-                            style="background-color: #fff;/* border: 1px solid #ccc; */border-top: 0;padding: 10px 20px 20px 20px;margin-bottom: 20px;display: flex">
-
-                            <table width="50%" class="tftable" border="1"
-                                style="font-size: 16px; color: #333333; width: 60%; border-width: 1px;  border-collapse: collapse; font-family: arial, sans-serif;    border: transparent;"
-                                width="50%">
-                                <tr style="background-color: #ffffff;">
-                                    <th style="    line-height: 1.1;font-size: 14px;border-width: 1px;padding: 9px 10px;border-style: solid;border-color: transparent;text-align: start;color: #000;border-color: transparent;"
-                                        align="center">Fan Model
-                                    </th>
-                                    <th colspan="2"
-                                        style="    line-height: 1.1;font-size: 14px;border-width: 1px;padding: 9px 10px;border-style: solid;border-color: transparent;text-align: start;color: #000;border-color: transparent;"
-                                        align="center">ARN 800
-                                    </th>
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Volume Flow </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        15,900 ft³/min</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Total Pressure </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        392 Pa</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Static Pressure </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        308 Pa</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Velocity Pressure </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        84 Pa</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td colspan="3"
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Total Efficiency (Fan,Motor,VFD)</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Fan Static Efficiency</td>
-
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Pa</td>
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Fan Total Efficiency</td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        91.67%</td>
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Power </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        3.45 kW</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Speed </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        1215 rpm</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Altitude of Installation</td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        0 m</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Temperature </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        °C</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Humidity </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        50% RH</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Air Density </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        1.2 kg/m³</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Inlet </td>
-
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Free </td>
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Specific Fan Power</td>
-
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        kw/m3s</td>
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Outlet </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Duct</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Sound Power Level</td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        84 dB(A)</td>
-
-
-                                </tr>
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        Sound Pressure Level </td>
-                                    <td
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                        84 dB(A)</td>
-
-
-                                </tr>
-
-
-                            </table>
-
-                            <table width="50%" class="tftable" border="1"
-                                style="font-size: 16px; color: #333333; width: 60%; border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif;    border: transparent;"
-                                width="50%">
-                                <tr>
-                                    <td colspan="2" style="    text-align: center;">
-                                        <img src="https://aeronautfans.com/wp-content/uploads/2022/11/Untitled_design__8_-removebg-preview.png"
-                                            /style=" width: 180px;">
-                                    </td>
-                                </tr>
-
-                                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-
-                                    <td colspan="2"
-                                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
-                                        <img src="{{graph}}"
-                                            / style="width: 350px; border: 1px solid #ccc;">
-                                    </td>
-
-                                </tr>
-
-                            </table>
-
-
-
-                        </div>
-                    </div>
-
-                    <table width="100%" class="tftable" border="1"
-                        style="font-size: 16px; color: #333333; width: 60%; border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif;    border: transparent;"
-                        width="50%">
-
-
-                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-
-                            <div
-                                style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;    border-color: #cccc; text-align: center;height: 140px;">
-                                <p>Some text....</p>
-
-                            </div>
-
-                        </tr>
-
-                    </table>
-
-
-
-
-
-                </content>
-            </div>
-
-            <footer>
-                <div id="" style=" border: 1px solid #ccc; padding: 13px 20px;">
-
-                    <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
-                        info@aeronautfans.com
-                    </p>
-                    <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
-                        Aeronaut Fans Industry Pvt Ltd - Banjara Hills RD12 - Hyderabad 500034
-                    </p>
-                </div>
-                <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;text-align: right">
-
-
-
-                    <p>Page 1 of 4</p>
-
-
-                </div>
-            </footer>
-
-        </page>
-
-    </div>
-
-
-    <page size="A4">
-
-        <div style="min-height: 271mm;">
+   <head>
+      <style>
+         page[size="A4"] {
+         background: #fff;
+         width: 210mm;
+         height: 300mm;
+         display: block;
+         margin: 0 auto;
+         margin-bottom: 0.5cm;
+         font-family: 'Mallory', Arial, Verdana, Sans-serif;
+         }
+         page {
+         background: #fff;
+         display: block;
+         margin: 0 auto;
+         margin-bottom: 5mm;
+         margin-top: 5mm;
+         padding: 14px;
+         }
+         page[size="A4"] {
+         width: 210mm;
+         height: 300mm;
+         }
+         @page {
+         size: 210mm 297mm;
+         margin: 10mm;
+         }
+         footer {
+         font-size: 9px;
+         text-align: center;
+         }
+         footer div p {
+         font-size: 14px;
+         }
+         footer {
+         position: relative;
+         right: 0;
+         width: 210mm;
+         left: 0;
+         margin: 0 auto;
+         }
+      </style>
+   </head>
+   <body>
+      <page size="A4">
+         <div style="min-height: 272mm;">
             <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;display: flex;
-    justify-content: space-between;">
-                <h1 style="margin-bottom: 0;">Motor Data Sheet
-                </h1>
-
-                <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="250" height="auto" />
-
+               justify-content: space-between;">
+               <h1 style="margin-bottom: 0;">Fan Data Sheet
+               </h1>
+               <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="200" height="auto" />
             </div>
-
+            <header
+               style="padding: 15px 25px; border-bottom: 1px solid #ccc;background-color: white;text-align: center;">
+            </header>
             <content>
-                <div style=" ">
-                    <div id="block"
-                        style="background-color: #fff;/* border: 1px solid #ccc; */border-top: 0;padding: 40px 20px 40px 20px;margin-bottom: 20px;display: flex;margin-top: 30px;">
-                        <table width="50%" class="tftable" border="1"
-                            style="font-size: 16px; 
-                                                           width: 60%; border-width: 1px; border-color: #ff8200; border-collapse: collapse; font-family: arial, sans-serif;"
-                            width="50%">
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <th style="    line-height: 1.1;font-size: 14px;
-               border-width: 1px;padding: 9px 10px;border-style: solid;border-color: transparent;text-align: left;"
-                                    align="center">Motor Model
-
-                                </th>
-                                <th colspan="2"
-                                    style="    line-height: 1.1;font-size: 14px;border-width: 1px;padding: 9px 10px;border-style: solid;border-color: transparent;text-align: left;"
-                                    align="center">Nidec 7.5kW - 4P
-
-                                </th>
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Product Code </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    M2BAX160MLB5</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Rated Power </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    7.5 kW</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Nominal Torque </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    49 Nm</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Rated Speed </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    1458 rpm</td>
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Rated Current </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    7.6 A</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Supply Voltage </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    3X415</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Rated Voltage </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    415 V</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Supply Frequency </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    50 Hz</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Insulation </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    F</td>
-
-
-                            </tr>
-
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Temperature rise </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    B</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Enclosure </td>
-
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    IP55</td>
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Efficiency Class </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    IE3</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Motor Efficiency</td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    92.1%</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    VFD Efficiency </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    97%</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Mounting arrangement </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    B5</td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Start-up </td>
-                                <td colspan="2"
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Direct Starting </td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Windings type</td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    1 Speed(1 Winding) </td>
-
-
-                            </tr>
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    Power Input </td>
-                                <td
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
-                                    12.9 kW</td>
-
-
-                            </tr>
-                        </table>
-                        <table width="50%" class="tftable" border="1"
-                            style="font-size: 16px; color: #333333; width: 60%; border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif; border: transparent"
-                            width="50%">
-                            <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                                <td colspan="2"
-                                    style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
-                                    <img src="https://aeronautfans.com/wp-content/uploads/2022/11/Aeronaut_Catalogue_v5-16-removebg-preview-e1669317646256.png"
-                                        / style="width: 350px; border: 1px solid #ccc;">
-                                </td>
-
-                            </tr>
-
-                        </table>
-                    </div>
-                </div>
-
-
-
-
-
+               <div id="block" style="background-color: #fff;    border-top: 3px solid #ccc;
+                  border-bottom: 3px solid #ccc; padding: 15px;display: flex;    margin-bottom: 20px;
+                  ">
+                  <table width="50%">
+                     <tr>
+                        <td style="font-size: 14px;">Customer</td>
+                        <td style="font-size: 14px;font-weight: bold;"><b>{{com_name}}</b></td>
+                     </tr>
+                     <tr>
+                        <td style="font-size: 14px;">Project</td>
+                        <td style="font-size: 14px;font-weight: bold;">{{proj_name}}</td>
+                     </tr>
+                     <tr>
+                        <td style="font-size: 14px;">Design Parameter</td>
+                        <td style="font-size: 14px;font-weight: bold;"> {{airflow}}{{airflow_unit}} @
+                           {{pressure}}{{pressure_unit}} 
+                        </td>
+                     </tr>
+                  </table>
+                  <table width="50%">
+                     <tr>
+                        <td style="font-size: 14px;">Branch</td>
+                        <td style="font-size: 14px;font-weight: bold;">{{com_branch_name}}</td>
+                     </tr>
+                     <tr>
+                        <td style="font-size: 14px;">Unit Name</td>
+                        <td style="font-size: 14px;font-weight: bold;">{{unit_name}}</td>
+                     </tr>
+                     <tr>
+                        <td style="font-size: 14px;">Date</td>
+                        <td style="font-size: 14px;font-weight: bold;">{{date}}</td>
+                     </tr>
+                  </table>
+               </div>
+               <div>
+                  <div id="block"
+                     style="background-color: #fff;border-top: 0;padding: 10px 20px 20px 20px;margin-bottom: 20px;display: flex">
+                     <table width="60%" class="tftable" border="1"
+                        style="font-size: 16px; color: #333333; width: 60%; border-width: 1px;  border-collapse: collapse; font-family: arial, sans-serif;    border: transparent;"
+                        >
+                        <tr style="background-color: #ffffff;">
+                           <th style="    line-height: 1.1;font-size: 14px;border-width: 1px;padding: 9px 10px;border-style: solid;border-color: transparent;text-align: start;color: #000;border-color: transparent;"
+                              align="center">Fan Model
+                           </th>
+                           <th colspan="2"
+                              style="    line-height: 1.1;font-size: 14px;border-width: 1px;padding: 9px 10px;border-style: solid;border-color: transparent;text-align: start;color: #000;border-color: transparent;"
+                              align="center">ARN {{diameter}}
+                           </th>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              TDS Blade angle 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{tds_blade_angle}} °
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Volume Flow 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{volume_flow}} ft³/min
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Total Pressure 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{total_pressure}} Pa
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Static Pressure 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{static_pressure}} Pa
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Velocity Pressure 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{velocity_pressure}} Pa
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td colspan="3"
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;font-weight: bold;">
+                              Total Efficiency (Fan,Motor,VFD)
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Fan Static Efficiency
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{static_pressure_percentage}} %
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Fan Total Efficiency
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{total_efficiency_percentage}}%
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Power 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{power}} kW
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Speed 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{fan_speed}} rpm
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Altitude of Installation
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{altitude_of_installation}} m
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Temperature 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{temperature}} °C
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Humidity 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{humidity}}% RH
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Air Density 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{air_density}} kg/m³
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Specific Fan Power
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{specific_fan_power}} kw/m3s
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Outlet 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{outlet}}
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Sound Power Level
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{outlet_sound_power_level}} dB(A)
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Sound Pressure Level 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{sound_pressure_level}} dB(A)
+                           </td>
+                        </tr>
+                     </table>
+                     <table width="40%" class="tftable" border="1"
+                        style="font-size: 16px; color: #333333; width: 60%; border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif;    border: transparent;">
+                        <tr>
+                           <td colspan="2" style="    text-align: center;">
+                              <img src="https://aeronautfans.com/wp-content/uploads/2022/11/Untitled_design__8_-removebg-preview.png"
+                                 style=" width: 180px;">
+                           </td>
+                        </tr>
+                     </table>
+                  </div>
+               </div>
             </content>
-
-
-        </div>
-        <footer>
+         </div>
+         <footer>
             <div id="" style=" border: 1px solid #ccc; padding: 13px 20px;">
-
-                <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
-                    info@aeronautfans.com
-                </p>
-                <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
-                    Aeronaut Fans Industry Pvt Ltd - Banjara Hills RD12 - Hyderabad 500034
-                </p>
+               <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
+                  info@aeronautfans.com
+               </p>
+               <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
+                  Aeronaut Fans Industry Pvt Ltd - LVS Arcade, 71, Jubilee Enclave, HITEC City, Hyderabad,
+                  Telangana, INDIA - 500081
+               </p>
             </div>
             <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;text-align: right">
-
-
-
-                <p>Page 2 of 4</p>
-
-
+               <p>Page 1 of 5</p>
             </div>
-        </footer>
-    </page>
-
-    <page size="A4">
-
-        <div style="min-height: 271mm;">
+         </footer>
+      </page>
+      <page size="A4">
+         <div style="min-height: 271mm;">
             <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;display: flex;
-    justify-content: space-between;">
-                <h2 style="margin-bottom: 0;">3D VFD Model
-                </h2>
-                <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="250" height="auto" />
+               justify-content: space-between;">
+               <h2 style="margin-bottom: 0;">Graphs
+               </h2>
+               <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="200" height="auto" />
+            </div>
+            <div style="display: inline-flex;">
+               <div style="text-align: center; padding-top: 10px;width: 50%;">
+                  <h3>GvP</h3>
+                  <img src="{{gvp_graph}}" style="width: 100%;"/>
+                  <!-- <img src="pdf-files/GvP.png" style="width: 100%;"/> -->
+               </div>
+               <div style="text-align: center;padding-left: 5px; padding-top: 10px;width: 50%;">
+                  <h3>GvEFF</h3>
+                  <img src="{{gveff_graph}}" style="width: 100%;"/>
+                  <!-- <img src="pdf-files/GvEFF.png" style="width: 100%;"/> -->
+               </div>
+            </div>
+            <div style="text-align: center; padding-bottom: 10px;width: 50%;">
+               <h3>GvN_FAN</h3>
+               <img src="{{gvn_fan_graph}}" style="width: 100%;">
+               <!-- <img src="pdf-files/GvN_FAN.png" style="width: 100%;"/> -->
+            </div>
+         </div>
+         <footer>
+            <div id="" style=" border: 1px solid #ccc; padding: 13px 20px;">
+               <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
+                  info@aeronautfans.com
+               </p>
+               <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
+                  Aeronaut Fans Industry Pvt Ltd - LVS Arcade, 71, Jubilee Enclave, HITEC City, Hyderabad, Telangana,
+                  INDIA - 500081
+               </p>
+            </div>
+            <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;text-align: right">
+               <p>Page 2 of 5</p>
+            </div>
+         </footer>
+      </page>
+      <page size="A4">
+         <div style="min-height: 271mm;">
+            <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;display: flex;
+               justify-content: space-between;">
+               <h1 style="margin-bottom: 0;">Motor Data Sheet
+               </h1>
+               <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="200" height="auto" />
+            </div>
+            <content>
+               <div >
+                  <div id="block"
+                     style="background-color: #fff;/* border: 1px solid #ccc; */border-top: 0;padding: 40px 20px 40px 20px;margin-bottom: 20px;display: flex;margin-top: 30px;">
+                     <table width="60%" class="tftable" border="1"
+                        style="font-size: 16px; 
+                        width: 60%; border-width: 1px; border-color: #ff8200; border-collapse: collapse; font-family: arial, sans-serif;"
+                        width="50%">
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <th style="line-height: 1.1;font-size: 14px;
+                              border-width: 1px;padding: 9px 10px;border-style: solid;border-color: transparent;text-align: left;"
+                              align="center">Motor Model
+                           </th>
+                           <th colspan="2"
+                              style="line-height: 1.1;font-size: 14px;border-width: 1px;padding: 9px 10px;border-style: solid;border-color: transparent;text-align: left;"
+                              align="center">{{motor_make}} {{classification}} {{motor_poles}}P
+                           </th>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Product Code 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{motor_model}}
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Rated Power 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{rated_power}} kW
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Nominal Torque 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{torque_nm}} Nm
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Rated Speed 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{rated_speed}} rpm
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Rated Current 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{rated_current_ina}} A
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Supply Voltage 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              3X{{rated_voltage}}
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Rated Voltage 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{rated_voltage}} V
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Supply Frequency 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{rated_motor_frequency}} Hz
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Insulation 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{insulation_class}}
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Temperature rise 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{temperature_rise}}
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Enclosure 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{ip_rating}}
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Efficiency Class 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{efficiency_class}}
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Motor Efficiency
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{efficiency_100}}%
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              VFD Efficiency 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{vfd_efficiency}}%
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Mounting arrangement 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{mounting_arrangement}}
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Start-up 
+                           </td>
+                           <td colspan="2"
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{start_up}} 
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Windings type
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{windings_type}} 
+                           </td>
+                        </tr>
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              Power Input 
+                           </td>
+                           <td
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;">
+                              {{power_input}} kW
+                           </td>
+                        </tr>
+                     </table>
+                     <table width="40%" class="tftable" border="1"
+                        style="font-size: 16px; color: #333333; width: 60%; border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif; border: transparent"
+                        width="50%">
+                        <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                           <td colspan="2"
+                              style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
+                              <img src="https://aeronautfans.com/wp-content/uploads/2022/11/Aeronaut_Catalogue_v5-16-removebg-preview-e1669317646256.png"
+                                 style="width: 350px; border: 1px solid #ccc;" />
+                           </td>
+                        </tr>
+                     </table>
+                  </div>
+               </div>
+            </content>
+         </div>
+         <footer>
+            <div id="" style=" border: 1px solid #ccc; padding: 13px 20px;">
+               <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
+                  info@aeronautfans.com
+               </p>
+               <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
+                  Aeronaut Fans Industry Pvt Ltd - LVS Arcade, 71, Jubilee Enclave, HITEC City, Hyderabad, Telangana,
+                  INDIA - 500081
+               </p>
+            </div>
+            <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;text-align: right">
+               <p>Page 3 of 5</p>
+            </div>
+         </footer>
+      </page>
+      <page size="A4">
+         <div style="min-height: 271mm;">
+            <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;display: flex;
+               justify-content: space-between;">
+               <h2 style="margin-bottom: 0;">3D VFD Model
+               </h2>
+               <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="200" height="auto" />
             </div>
             <div style="text-align: center; padding-bottom: 60px;">
-
-                <img src="https://media.licdn.com/dms/image/C5112AQFsCTEBaVbRhA/article-cover_image-shrink_423_752/0/1523015758507?e=1692230400&v=beta&t=Tv7pNR-E7uuPUxkZO18imuFV7weR2_BxECmlKq_h1bg"
-                    / style="width: 60%;">
+               <img src="https://media.licdn.com/dms/image/C5112AQFsCTEBaVbRhA/article-cover_image-shrink_423_752/0/1523015758507?e=1692230400&v=beta&t=Tv7pNR-E7uuPUxkZO18imuFV7weR2_BxECmlKq_h1bg"
+                  style="width: 60%;">
             </div>
             <table width="100%" class="tftable" border="1"
-                style="font-size: 16px; color: #333333;  border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif;    border: transparent;">
-
-
-                <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-
-                    <div
-                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;    border-color: #cccc; text-align: left;height: 140px; margin-bottom: 80px;">
-                        <p>Notes....</p>
-
-                    </div>
-
-                </tr>
-
+               style="font-size: 16px; color: #333333;  border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif;    border: transparent;">
+               <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                  <div
+                     style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;    border-color: #cccc; text-align: left;height: 140px; margin-bottom: 80px;">
+                     <p>Notes....</p>
+                  </div>
+               </tr>
             </table>
             <div>
-                <table width="100%" class="tftable" border="1"
-                    style="font-size: 16px; color: #333333; border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif; border: transparent">
-                    <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-                            <img src="https://aeronautfans.com/wp-content/uploads/2022/11/Untitled_design__8_-removebg-preview.png"
-                                / style="width: 99px; border: 1px solid #ccc;">
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-                            <h1>+</h1>
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-                            <img src="https://aeronautfans.com/wp-content/uploads/2022/11/Aeronaut_Catalogue_v5-16-removebg-preview-e1669317646256.png"
-                                / style="width: 150px; border: 1px solid #ccc;">
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-                            <h1>+</h1>
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-                            <img src="https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/70ad6f89ae849fa33c0a62ed402cffdf/large.png"
-                                / style="width: 150px; border: 1px solid #ccc;">
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-                            <h1>=</h1>
-                        </td>
-                        <td colspan="2"
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;line-height: 1.4;">
-                            <h2> System <br> Efficiency</h2>
-                        </td>
-                    </tr>
-                    <tr style="background-color: #ffffff;" bgcolor="#ffffff">
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
-                            <h2>Fan </h2>
-                            <h2>94% </h2>
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
-                            <h2>Motor </h2>
-                            <h2>96% </h2>
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
-                            <h2>VFD </h2>
-                            <h2>98% </h2>
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
-
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
-                            <h2> </h2>
-                            <h2>88% </h2>
-                        </td>
-                        <td
-                            style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
-
-                        </td>
-                    </tr>
-
-                </table>
+               <table width="100%" class="tftable" border="1"
+                  style="font-size: 16px; color: #333333; border-width: 1px; border-collapse: collapse; font-family: arial, sans-serif; border: transparent">
+                  <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                        <img src="https://aeronautfans.com/wp-content/uploads/2022/11/Untitled_design__8_-removebg-preview.png"
+                           style="width: 99px; border: 1px solid #ccc;">
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                        <h1>X</h1>
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                        <img src="https://aeronautfans.com/wp-content/uploads/2022/11/Aeronaut_Catalogue_v5-16-removebg-preview-e1669317646256.png"
+                           style="width: 150px; border: 1px solid #ccc;">
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                        <h1>X</h1>
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                        <img src="https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/70ad6f89ae849fa33c0a62ed402cffdf/large.png"
+                           style="width: 150px; border: 1px solid #ccc;">
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                        <h1>=</h1>
+                     </td>
+                     <td colspan="2"
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;line-height: 1.4;">
+                        <h2> System <br> Efficiency</h2>
+                     </td>
+                  </tr>
+                  <tr style="background-color: #ffffff;" bgcolor="#ffffff">
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
+                        <h2>Fan </h2>
+                        <h2>{{total_efficiency_percentage}}%</h2>
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
+                        <h2>Motor </h2>
+                        <h2>{{efficiency_100}}%</h2>
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
+                        <h2>VFD </h2>
+                        <h2>{{vfd_efficiency}}%</h2>
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: center;">
+                        <h2> </h2>
+                        <h2>{{system_efficiency}}% </h2>
+                     </td>
+                     <td
+                        style="line-height: 0.4;font-size: 14px;border-width: 1px;padding: 10px 9px;border-style: solid;border-color: transparent;    text-align: left;">
+                     </td>
+                  </tr>
+               </table>
             </div>
-        </div>
-
-        <footer>
+         </div>
+         <footer>
             <div id="" style=" border: 1px solid #ccc; padding: 13px 20px;">
-                <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
-                    info@aeronautfans.com
-                </p>
-                <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
-                    Aeronaut Fans Industry Pvt Ltd - Banjara Hills RD12 - Hyderabad 500034
-                </p>
+               <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
+                  info@aeronautfans.com
+               </p>
+               <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
+                  Aeronaut Fans Industry Pvt Ltd - LVS Arcade, 71, Jubilee Enclave, HITEC City, Hyderabad, Telangana,
+                  INDIA - 500081
+               </p>
             </div>
             <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;text-align: right">
-                <p>Page 3 of 4</p>
+               <p>Page 4 of 5</p>
             </div>
-        </footer>
-    </page>
-    <page size="A4">
-        <div style="min-height: 271mm;">
+         </footer>
+      </page>
+      <page size="A4">
+         <div style="min-height: 271mm;">
             <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;display: flex;
-    justify-content: space-between;">
-                <h2 style="margin-bottom: 0;">GAD with Dimensions
-                </h2>
-                <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="250" height="auto" />
+               justify-content: space-between;">
+               <h2 style="margin-bottom: 0;">GAD with Dimensions
+               </h2>
+               <img src="https://aeronautfans.com/wp-content/uploads/2022/10/aerologo.png" width="200" height="auto" />
             </div>
-
             <div style="text-align: center; padding-bottom: 60px; padding-top: 20px">
-                <h1>Top View</h1>
-                <img src="https://www.okinawabeachhousewedding.com/upload/2018-09-04-13-20-03_top_sample.jpg" /
-                    style="width: 50%;">
+               <h1>Top View</h1>
+               <img src="https://www.okinawabeachhousewedding.com/upload/2018-09-04-13-20-03_top_sample.jpg" /
+                  style="width: 50%;">
             </div>
             <div style="text-align: center; padding-bottom: 40px;">
-                <h1>Site View</h1>
-                <img src="https://www.okinawabeachhousewedding.com/upload/2018-09-04-13-20-03_top_sample.jpg" /
-                    style="width: 50%;">
+               <h1>Site View</h1>
+               <img src="https://www.okinawabeachhousewedding.com/upload/2018-09-04-13-20-03_top_sample.jpg" /
+                  style="width: 50%;">
             </div>
-        </div>
-        <footer>
+         </div>
+         <footer>
             <div id="" style=" border: 1px solid #ccc; padding: 13px 20px;">
-                <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
-                    info@aeronautfans.com
-                </p>
-                <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
-                    Aeronaut Fans Industry Pvt Ltd - Banjara Hills RD12 - Hyderabad 500034
-                </p>
+               <p style=" margin-top: 0px; margin-bottom: 10px; letter-spacing: 1.9px;color: #000">
+                  info@aeronautfans.com
+               </p>
+               <p style=" margin-top: 0px; margin-bottom: 0px; letter-spacing: 1.9px;color: #000">
+                  Aeronaut Fans Industry Pvt Ltd - LVS Arcade, 71, Jubilee Enclave, HITEC City, Hyderabad, Telangana,
+                  INDIA - 500081
+               </p>
             </div>
             <div id="top-block" style="margin: 0px 0; padding: 0px; padding-bottom: 13px;text-align: right">
-
-
-
-                <p>Page 4 of 4</p>
-
-
+               <p>Page 5 of 5</p>
             </div>
-
-        </footer>
-    </page>
-</body>
-
-
+         </footer>
+      </page>
+   </body>
 </html>
