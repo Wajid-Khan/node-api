@@ -11,7 +11,7 @@ const { createPdf } = require("./pdf.js");
 const fanData = require("./files/fansdata");
 const _ = require("lodash");
 const fetch = require("node-fetch");
-const fandata_api_url = "http://fanapi.aeronautfans.com/"; 
+const fandata_api_url = "http://192.250.226.152:8000/"; 
 //const fandata_api_url = "http://localhost:3007/";
 //const plotgraph = "http://13.234.30.175/plotgraph";
 
@@ -1201,84 +1201,96 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
             updated_date: null
         }
         const dsh = await common.checkForSearchFanDuplicates(_obj);
-
         if (dsh.length == 0) {
             const response = await fetch(url);
             if (response?.status == 200) {
-                console.log(url);
-                const sh = await common.insertsearchhistory(_obj);
+                //console.log(url);
                 const data = await response.json();
-                const mmArr = _.map(data, 'DIA')
-                console.log(mmArr);
-                const mmString = mmArr.toString();
-                const unit = await pool.query(`SELECT * FROM lookup_fans where fan_diameter IN (${mmString}) `);
-                const dia = unit.rows;
-                var finalObj = [];
-                data.forEach(e => {
-                    console.log(e.DIA);
-                    let f = _.filter(dia, function (o) { return o.fan_diameter == e.DIA; });
-                    let static_pressure_percentage = (((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area)))) / 1000) / e?.N_FAN) * 100);
-                    let static_pressure_percentage_sd = (((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area)))) / 1000) / e?.N_FAN) * 100);
-                    let static_pressure_percentage_ld = (((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area)))) / 1000) / e?.N_FAN) * 100);
-                    let _elem = {
-                        selected_unit_fan_id: uuidv4(),
-                        diameter: e?.DIA,
-                        angle: e?.ANG,
-                        air_flow: e?.G,
-                        pressure: e?.P,
-                        fan_area: f[0].fan_area,
-                        fan_area_sd: f[0].sd_area,
-                        fan_area_ld: f[0].ld_area,
-                        air_flow_m3s: (e?.G / cfm_to_cms_converter),
-                        fan_velocity: ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area),
-                        fan_velocity_sd: ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area),
-                        fan_velocity_ld: ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area),
-                        velocity_pressure: (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area)),
-                        velocity_pressure_sd: (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area)),
-                        velocity_pressure_ld: (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area)),
-                        static_pressure: (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area))),
-                        static_pressure_sd: (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area))),
-                        static_pressure_ld: (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area))),
-                        fan_speed: e?.N,
-                        power: e?.N_FAN,
-                        power_vfd: (e?.N_FAN * vfd_constant),
-                        total_efficiency: e?.EFF_TT,
-                        total_static_efficiency: e?.EFF_TS,
-                        total_pressure: e?.PRTT,
-                        static_pressure_prts: e?.PRTS,
-                        lpa: e?.LpA,
-                        lp: e?.Lp,
-                        lwat: e?.LwAt,
-                        lwt: e?.Lwt,
-                        lwai: e?.LwAi,
-                        lwi: e?.Lwi,
-                        max_torque_required: (((e?.N_FAN * 1000) * 60) / (2 * 3.14 * e?.N)),
-                        total_efficiency_percentage: (e?.EFF_TT * 100),
-                        static_pressure_percentage: static_pressure_percentage == Infinity ? null : static_pressure_percentage, //(((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area)))) / 1000) / e?.N_FAN) * 100),
-                        static_pressure_percentage_sd: static_pressure_percentage == Infinity ? null : static_pressure_percentage_sd, //(((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area)))) / 1000) / e?.N_FAN) * 100),
-                        static_pressure_percentage_ld: static_pressure_percentage == Infinity ? null : static_pressure_percentage_ld, //(((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area)))) / 1000) / e?.N_FAN) * 100),
-                        inlet_sound_power_level: e?.LwAi,
-                        outlet_sound_power_level: e?.LwAi,
-                        sound_pressure_level: e?.LpA,
-                        breakout_sound_power_level: null,
-                        breakout_sound_pressure_level: null,
-                        specific_fan_power: (e?.N_FAN / (e?.G / cfm_to_cms_converter)),
-                        created_by: created_by,
-                        created_date: new Date(),
-                        search_fan_history_id: search_fan_history_id,
-                        pu_id: pu_id,
-                        search_fan_history_id: search_fan_history_id
+                console.log("--------------------");
+                console.log(data);
+               
+                if(data.length > 0){
+                    const sh = await common.insertsearchhistory(_obj);
+                    const mmArr = _.map(data, 'DIA')
+                    console.log(mmArr);
+                    const mmString = mmArr.toString();
+                    const unit = await pool.query(`SELECT * FROM lookup_fans where fan_diameter IN (${mmString}) `);
+                    const dia = unit.rows;
+                    var finalObj = [];
+                    data.forEach(e => {
+                        console.log(e.DIA);
+                        let f = _.filter(dia, function (o) { return o.fan_diameter == e.DIA; });
+                        let static_pressure_percentage = (((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area)))) / 1000) / e?.N_FAN) * 100);
+                        let static_pressure_percentage_sd = (((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area)))) / 1000) / e?.N_FAN) * 100);
+                        let static_pressure_percentage_ld = (((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area)))) / 1000) / e?.N_FAN) * 100);
+                        let _elem = {
+                            selected_unit_fan_id: uuidv4(),
+                            diameter: e?.DIA,
+                            angle: e?.ANG,
+                            air_flow: e?.G,
+                            pressure: e?.P,
+                            fan_area: f[0].fan_area,
+                            fan_area_sd: f[0].sd_area,
+                            fan_area_ld: f[0].ld_area,
+                            air_flow_m3s: (e?.G / cfm_to_cms_converter),
+                            fan_velocity: ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area),
+                            fan_velocity_sd: ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area),
+                            fan_velocity_ld: ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area),
+                            velocity_pressure: (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area)),
+                            velocity_pressure_sd: (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area)),
+                            velocity_pressure_ld: (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area)),
+                            static_pressure: (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area))),
+                            static_pressure_sd: (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area))),
+                            static_pressure_ld: (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area))),
+                            fan_speed: e?.N,
+                            power: e?.N_FAN,
+                            power_vfd: (e?.N_FAN * vfd_constant),
+                            total_efficiency: e?.EFF_TT,
+                            total_static_efficiency: e?.EFF_TS,
+                            total_pressure: e?.PRTT,
+                            static_pressure_prts: e?.PRTS,
+                            lpa: e?.LpA,
+                            lp: e?.Lp,
+                            lwat: e?.LwAt,
+                            lwt: e?.Lwt,
+                            lwai: e?.LwAi,
+                            lwi: e?.Lwi,
+                            max_torque_required: (((e?.N_FAN * 1000) * 60) / (2 * 3.14 * e?.N)),
+                            total_efficiency_percentage: (e?.EFF_TT * 100),
+                            static_pressure_percentage: static_pressure_percentage == Infinity ? null : static_pressure_percentage, //(((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.fan_area)))) / 1000) / e?.N_FAN) * 100),
+                            static_pressure_percentage_sd: static_pressure_percentage == Infinity ? null : static_pressure_percentage_sd, //(((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.sd_area)))) / 1000) / e?.N_FAN) * 100),
+                            static_pressure_percentage_ld: static_pressure_percentage == Infinity ? null : static_pressure_percentage_ld, //(((((e?.G / cfm_to_cms_converter) * (e?.P - (fan_velocity_pressure * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area) * ((e?.G / cfm_to_cms_converter) / f[0]?.ld_area)))) / 1000) / e?.N_FAN) * 100),
+                            inlet_sound_power_level: e?.LwAi,
+                            outlet_sound_power_level: e?.LwAi,
+                            sound_pressure_level: e?.LpA,
+                            breakout_sound_power_level: null,
+                            breakout_sound_pressure_level: null,
+                            specific_fan_power: (e?.N_FAN / (e?.G / cfm_to_cms_converter)),
+                            created_by: created_by,
+                            created_date: new Date(),
+                            search_fan_history_id: search_fan_history_id,
+                            pu_id: pu_id,
+                            search_fan_history_id: search_fan_history_id
+                        };
+                        finalObj.push(_elem);
+                    });
+                    console.log(finalObj);
+                    common.insertMultipleRecords(finalObj);
+                    console.log("from Phython");
+                    responseObj = {
+                        "is_success": true,
+                        "message": "",
+                        "data": finalObj
                     };
-                    finalObj.push(_elem);
-                });
-                console.log(finalObj);
-                common.insertMultipleRecords(finalObj);
-                console.log("from Phython");
-                responseObj = {
-                    "is_success": true,
-                    "message": "",
-                    "data": finalObj
-                };
+                }
+                else {
+                    responseObj = {
+                        "is_success": false,
+                        "message": "No record(s) found",
+                        "data": []
+                    };
+                }
+                
             }
             else {
                 console.log(url);
