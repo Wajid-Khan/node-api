@@ -1712,6 +1712,7 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                 let rpm = unit_fan.rows[0]?.fan_speed;
                                 const url = `${fandata_api_url}plotgraph?diameter=${diameter}&airflow=${airflow}&pressure=${pressure}&rpm=${rpm}`;
                                 const response = await fetch(url);
+                                console.log(response);
                                 if (response?.status == 200) {
                                     const data1 = await response.json();
                                     data1.forEach(e => {
@@ -1861,6 +1862,7 @@ app.put("/api/plotgraph", async (req, res) => {
         else {
             const url = `${fandata_api_url}plotgraph?diameter=${diameter}&airflow=${airflow}&pressure=${pressure}&rpm=${rpm}`;
             const response = await fetch(url);
+            console.log(response);
             var finalObj = [];
             if (response?.status == 200) {
                 const data = await response.json();
