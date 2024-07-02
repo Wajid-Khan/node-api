@@ -11,7 +11,8 @@ const { createPdf } = require("./pdf.js");
 const fanData = require("./files/fansdata");
 const _ = require("lodash");
 const fetch = require("node-fetch");
-const fandata_api_url = "http://192.250.226.152:8000/"; 
+
+const fandata_api_url = "https://fanapi.aeronautfans.com/"; 
 //const fandata_api_url = "http://localhost:3007/";
 //const plotgraph = "http://13.234.30.175/plotgraph";
 
@@ -1711,6 +1712,7 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                 let pressure = project_unit.rows[0]?.pressure_conversion;
                                 let rpm = unit_fan.rows[0]?.fan_speed;
                                 const url = `${fandata_api_url}plotgraph?diameter=${diameter}&airflow=${airflow}&pressure=${pressure}&rpm=${rpm}`;
+                                console.log(url);
                                 const response = await fetch(url);
                                 console.log(response);
                                 if (response?.status == 200) {
@@ -1728,7 +1730,8 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                     });
                                    common.insertMultiplePlotGraph(finalObj);
                                 }
-                               
+                                console.log("response");
+                                console.log(response);
                                
                                 const currentDate = new Date();
                                 const formattedDate = currentDate.toLocaleDateString('en-GB', {
