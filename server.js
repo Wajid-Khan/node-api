@@ -663,6 +663,8 @@ app.post("/api/unit/create", async (req, res) => {
         let pressure_luc_name = null;
         let airflow_conversion = null;
         let pressure_conversion = null;
+        let airflow_conversion_5 = null;
+        let pressure_conversion_5 = null;
         if (duplicate.length > 0) {
             responseObj = {
                 "is_success": false,
@@ -681,13 +683,15 @@ app.post("/api/unit/create", async (req, res) => {
             if (lookupunit.rows.length > 0) {
                 airflow_luc_name =  _.filter(lookupunit.rows, function (o) { return o.luc_id == airflow_luc_id; })[0].unit;
                 airflow_conversion =  Math.round(airflow * _.filter(lookupunit.rows, function (o) { return o.luc_id == airflow_luc_id; })[0].conversion);
+                airflow_conversion_5 = Math.round(airflow_conversion / 5) * 5;
                 pressure_luc_name =  _.filter(lookupunit.rows, function (o) { return o.luc_id == pressure_luc_id; })[0].unit;
                 pressure_conversion = Math.round(pressure *  _.filter(lookupunit.rows, function (o) { return o.luc_id == pressure_luc_id; })[0].conversion);
+                pressure_conversion_5 = Math.round(pressure_conversion / 5) * 5;
             }
 
             const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id, pressure_type, airflow_luc_name, pressure_luc_name, airflow_conversion, pressure_conversion) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *",
                 [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id, pressure_type,
-                     airflow_luc_name, pressure_luc_name, airflow_conversion, pressure_conversion]);
+                     airflow_luc_name, pressure_luc_name, airflow_conversion_5, pressure_conversion_5]);
 
             responseObj = {
                 "is_success": true,
