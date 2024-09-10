@@ -882,6 +882,34 @@ app.get("/api/unit/delete/:id", async (req, res) => {
     }
 });
 
+app.get("/api/selectedfan/delete/:unit_fan_id/:pu_id", async (req, res) => {
+    try {
+        const { unit_fan_id, pu_id } = req.params;
+       
+        const punit = await pool.query("SELECT * FROM project_units where pu_id = $1 and unit_fan_id = $2", [pu_id, unit_fan_id]);
+        if (punit.rows.length > 0) {
+            const up = await pool.query("Update project_units Set unit_fan_id=null WHERE pu_id = $1", [pu_id]);
+        }
+        const todo = await pool.query("delete from unit_fans WHERE unit_fan_id = $1", [unit_fan_id]);
+
+        responseObj = {
+            "is_success": true,
+            "message": "Selected Fan has been deleted",
+            "data": null
+        };
+
+        res.json(responseObj);
+
+    } catch (err) {
+        responseObj = {
+            "is_success": false,
+            "message": err.message,
+            "data": null
+        };
+        res.json(responseObj);
+    }
+});
+
 //_______________________________End__Company__Unit____________________________________________________//
 
 
