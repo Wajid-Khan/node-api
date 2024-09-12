@@ -12,7 +12,7 @@ const fanData = require("./files/fansdata");
 const _ = require("lodash");
 const fetch = require("node-fetch");
 
-const fandata_api_url = "https://fanapi.aeronautfans.com/"; 
+const fandata_api_url = "https://fanapi.aeronautfans.com/";
 //const fandata_api_url = "http://localhost:3007/";
 //const plotgraph = "http://13.234.30.175/plotgraph";
 
@@ -681,17 +681,17 @@ app.post("/api/unit/create", async (req, res) => {
             //api/lookup/unitconversions
             const lookupunit = await pool.query("SELECT * FROM lookup_unit_conversion order by type asc");
             if (lookupunit.rows.length > 0) {
-                airflow_luc_name =  _.filter(lookupunit.rows, function (o) { return o.luc_id == airflow_luc_id; })[0].unit;
-                airflow_conversion =  Math.round(airflow * _.filter(lookupunit.rows, function (o) { return o.luc_id == airflow_luc_id; })[0].conversion);
+                airflow_luc_name = _.filter(lookupunit.rows, function (o) { return o.luc_id == airflow_luc_id; })[0].unit;
+                airflow_conversion = Math.round(airflow * _.filter(lookupunit.rows, function (o) { return o.luc_id == airflow_luc_id; })[0].conversion);
                 airflow_conversion_5 = Math.round(airflow_conversion / 5) * 5;
-                pressure_luc_name =  _.filter(lookupunit.rows, function (o) { return o.luc_id == pressure_luc_id; })[0].unit;
-                pressure_conversion = Math.round(pressure *  _.filter(lookupunit.rows, function (o) { return o.luc_id == pressure_luc_id; })[0].conversion);
+                pressure_luc_name = _.filter(lookupunit.rows, function (o) { return o.luc_id == pressure_luc_id; })[0].unit;
+                pressure_conversion = Math.round(pressure * _.filter(lookupunit.rows, function (o) { return o.luc_id == pressure_luc_id; })[0].conversion);
                 pressure_conversion_5 = Math.round(pressure_conversion / 5) * 5;
             }
 
             const comp = await pool.query("INSERT INTO project_units (pu_id, proj_id, unit_name, cb_id, com_id, created_by, created_date, pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id, pressure_type, airflow_luc_name, pressure_luc_name, airflow_conversion, pressure_conversion) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *",
                 [pu_id, proj_id, unit_name, cb_id, com_id, created_by, new Date(), pu_no, airflow, pressure, airflow_luc_id, pressure_luc_id, pressure_type,
-                     airflow_luc_name, pressure_luc_name, airflow_conversion_5, pressure_conversion_5]);
+                    airflow_luc_name, pressure_luc_name, airflow_conversion_5, pressure_conversion_5]);
 
             responseObj = {
                 "is_success": true,
@@ -716,7 +716,7 @@ app.post("/api/unit/create", async (req, res) => {
 app.post("/api/unit/create/bulk", async (req, res) => {
     try {
         let units = req.body;
-       
+
         const duplicate = await common.check_pu_name(units.map(a => a.unit_name), units[0].proj_id);
         if (duplicate.length > 0) {
             responseObj = {
@@ -730,9 +730,9 @@ app.post("/api/unit/create/bulk", async (req, res) => {
             const lookupunit = await pool.query("SELECT * FROM lookup_unit_conversion order by type asc");
             for (const i in units) {
                 let airflow_luc_id = _.filter(lookupunit.rows, function (o) { return o.unit == units[i].airflow_unit; })[0]?.luc_id;
-                let airflow_conversion =  Math.round(units[i].airflow * _.filter(lookupunit.rows, function (o) { return o.luc_id == airflow_luc_id; })[0].conversion);
+                let airflow_conversion = Math.round(units[i].airflow * _.filter(lookupunit.rows, function (o) { return o.luc_id == airflow_luc_id; })[0].conversion);
                 let pressure_luc_id = _.filter(lookupunit.rows, function (o) { return o.unit == units[i].pressure_unit; })[0]?.luc_id;
-                let pressure_conversion = Math.round(units[i].pressure *  _.filter(lookupunit.rows, function (o) { return o.luc_id == pressure_luc_id; })[0].conversion);
+                let pressure_conversion = Math.round(units[i].pressure * _.filter(lookupunit.rows, function (o) { return o.luc_id == pressure_luc_id; })[0].conversion);
                 units[i].pu_id = uuidv4();
                 units[i].pu_no = await common.generate_pu_no(units[i].proj_id);
                 units[i].airflow_luc_id = airflow_luc_id;
@@ -885,7 +885,7 @@ app.get("/api/unit/delete/:id", async (req, res) => {
 app.get("/api/selectedfan/delete/:unit_fan_id/:pu_id", async (req, res) => {
     try {
         const { unit_fan_id, pu_id } = req.params;
-       
+
         const punit = await pool.query("SELECT * FROM project_units where pu_id = $1 and unit_fan_id = $2", [pu_id, unit_fan_id]);
         if (punit.rows.length > 0) {
             const up = await pool.query("Update project_units Set unit_fan_id=null WHERE pu_id = $1", [pu_id]);
@@ -1241,8 +1241,8 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
                 const data = await response.json();
                 console.log("--------------------");
                 console.log(data);
-               
-                if(data.length > 0){
+
+                if (data.length > 0) {
                     const sh = await common.insertsearchhistory(_obj);
                     const mmArr = _.map(data, 'DIA')
                     console.log(mmArr);
@@ -1323,7 +1323,7 @@ app.post("/api/fansdata/searchfansdata", async (req, res) => {
                         "data": []
                     };
                 }
-                
+
             }
             else {
                 console.log(url);
@@ -1605,27 +1605,46 @@ app.put("/api/unitfan/updatemotorforfan", async (req, res) => {
 //_____________________________Save_Unit_Fans_END_________________________________________________
 async function generatePDF(data) {
     // Read the HTML template
-    const template = fs.readFileSync('fandatasheet.html', 'utf-8');
+    try {
+        const template = fs.readFileSync('fandatasheet.html', 'utf-8');
+        // Compile the template with Handlebars
+        const compiledTemplate = handlebars.compile(template);
 
-    // Compile the template with Handlebars
-    const compiledTemplate = handlebars.compile(template);
+        // Replace placeholders with actual data
+        const html = compiledTemplate(data);
+       
 
-    // Replace placeholders with actual data
-    const html = compiledTemplate(data);
+        // Launch Puppeteer and generate PDF
+        //const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']  })
+        const page = await browser.newPage();
+        await page.setContent(html);
+        const pdf = await page.pdf({ format: 'A4' });
 
-    // Launch Puppeteer and generate PDF
-    //const browser = await puppeteer.launch();
-    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
-    const page = await browser.newPage();
-    await page.setContent(html);
-    const pdf = await page.pdf({ format: 'A4' });
+        // Save the PDF to a file
+        fs.writeFileSync(`pdf-files/${data?.id}.pdf`, pdf);
+       
+        // Close the browser
+        await browser.close();
+        return "File created Success";
+    } catch (error) {
+        logError("catch");
+        logError(error);
+        return "File created Fail";
+    }
 
-    // Save the PDF to a file
-    fs.writeFileSync(`pdf-files/${data?.id}.pdf`, pdf);
-
-    // Close the browser
-    await browser.close();
 }
+
+function logError(error) {
+    // Create a timestamp
+    const timestamp = new Date().toISOString();
+  
+    // Log error to the console
+    console.error(`${timestamp} - Error: ${error}`);
+  
+    // Append the error message to a log file
+    fs.appendFileSync('error.log', `${timestamp} - Error: ${error}\n`);
+  }
 
 
 app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
@@ -1655,9 +1674,9 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                         where p.proj_id = $1`
                         const project = await pool.query(query, [project_unit.rows[0]?.proj_id]);
                         if (project.rows.length > 0) {
-                            
+
                             const base64 = await pool.query("Select * from base64data WHERE pressure = $1 and airflow = $2 and diameter = $3 and rpm = $4",
-                             [project_unit.rows[0]?.pressure_conversion, project_unit.rows[0]?.airflow_conversion, unit_fan.rows[0]?.diameter, unit_fan.rows[0]?.fan_speed]);
+                                [project_unit.rows[0]?.pressure_conversion, project_unit.rows[0]?.airflow_conversion, unit_fan.rows[0]?.diameter, unit_fan.rows[0]?.fan_speed]);
                             if (base64.rows.length > 0) {
                                 const currentDate = new Date();
                                 const formattedDate = currentDate.toLocaleDateString('en-GB', {
@@ -1713,7 +1732,7 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                     start_up: "Direct Starting",
                                     windings_type: "1 Speed(1 Winding)",
                                     power_input: ((unit_fan.rows[0]?.power / vfd_eff) / motor.rows[0]?.efficiency_100).toFixed(2),
-                                    system_efficiency: ((unit_fan.rows[0]?.total_efficiency_percentage * motor.rows[0]?.efficiency_100 * vfd_eff)/10000).toFixed(2),
+                                    system_efficiency: ((unit_fan.rows[0]?.total_efficiency_percentage * motor.rows[0]?.efficiency_100 * vfd_eff) / 10000).toFixed(2),
                                     gvp_graph: base64.rows[0].base64,
                                     gveff_graph: base64.rows[1].base64,
                                     gvn_fan_graph: base64.rows[2].base64,
@@ -1728,14 +1747,16 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                         };
                                         res.json(responseObj);
                                     })
-                                    .catch((error) => {
+                                    .catch((err) => {
                                         responseObj = {
                                             "is_success": false,
-                                            "message": error,
-                                            "data": data
+                                            "message": JSON.stringify(err),
+                                            "data": err
                                         };
                                         res.json(responseObj);
                                     });
+
+                               
                             }
                             else {
                                 var finalObj = [];
@@ -1760,11 +1781,11 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                         };
                                         finalObj.push(base64_Data);
                                     });
-                                   common.insertMultiplePlotGraph(finalObj);
+                                    common.insertMultiplePlotGraph(finalObj);
                                 }
                                 console.log("response");
                                 console.log(response);
-                               
+
                                 const currentDate = new Date();
                                 const formattedDate = currentDate.toLocaleDateString('en-GB', {
                                     day: '2-digit',
@@ -1819,7 +1840,7 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                     start_up: "Direct Starting",
                                     windings_type: "1 Speed(1 Winding)",
                                     power_input: ((unit_fan.rows[0]?.power / vfd_eff) / motor.rows[0]?.efficiency_100).toFixed(2),
-                                    system_efficiency: ((unit_fan.rows[0]?.total_efficiency_percentage * motor.rows[0]?.efficiency_100 * vfd_eff)/10000).toFixed(2),
+                                    system_efficiency: ((unit_fan.rows[0]?.total_efficiency_percentage * motor.rows[0]?.efficiency_100 * vfd_eff) / 10000).toFixed(2),
                                     gvp_graph: finalObj[0]?.base64,
                                     gveff_graph: finalObj[1]?.base64,
                                     gvn_fan_graph: finalObj[2]?.base64,
@@ -1838,11 +1859,13 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                     .catch((error) => {
                                         responseObj = {
                                             "is_success": false,
-                                            "message": error,
+                                            "message": "error",
                                             "data": data
                                         };
                                         res.json(responseObj);
                                     });
+
+                               
                             }
 
                         }
@@ -1869,7 +1892,7 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
     } catch (err) {
         responseObj = {
             "is_success": false,
-            "message": err.message,
+            "message": err?.message,
             "data": null
         };
         res.json(responseObj);
@@ -1912,14 +1935,14 @@ app.put("/api/plotgraph", async (req, res) => {
                     };
                     finalObj.push(base64_Data);
                 });
-               common.insertMultiplePlotGraph(finalObj);
+                common.insertMultiplePlotGraph(finalObj);
                 responseObj = {
                     "is_success": true,
                     "message": '',
                     "data": finalObj
                 };
             }
-            else{
+            else {
                 responseObj = {
                     "is_success": false,
                     "message": 'Unable to generate Graph for this record',

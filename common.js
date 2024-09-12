@@ -176,7 +176,7 @@ function setfanfromselectedfans(pu_id, unit_fan_id, fan_selected_by, fan_selecte
 }
 
 function checkForDuplicates(obj) {
-  let q = `SELECT * FROM unit_fans WHERE diameter = ${obj?.diameter} and angle = ${obj?.angle} and air_flow = ${obj?.air_flow} and pressure = ${obj?.pressure}
+  let q = `SELECT * FROM unit_fans WHERE pu_id ='${obj?.pu_id}' and diameter = ${obj?.diameter} and angle = ${obj?.angle} and air_flow = ${obj?.air_flow} and pressure = ${obj?.pressure}
      and fan_velocity = ${obj?.fan_velocity} and velocity_pressure = ${obj?.velocity_pressure} and static_pressure = ${obj?.static_pressure} and fan_speed = ${obj?.fan_speed}
      and power = ${obj?.power} and power_vfd = ${obj?.power_vfd} and total_efficiency = ${obj?.total_efficiency} and total_static_efficiency = ${obj?.total_static_efficiency} and total_pressure = ${obj?.total_pressure} 
      and static_pressure_prts = ${obj?.static_pressure_prts} and lpa = ${obj?.lpa} and lp = ${obj?.lp} and lwat = ${obj?.lwat} and lwt = ${obj?.lwt} and lwai = ${obj?.lwai} and lwi = ${obj?.lwi} 
@@ -184,6 +184,7 @@ function checkForDuplicates(obj) {
      and inlet_sound_power_level = ${obj?.inlet_sound_power_level} and outlet_sound_power_level = ${obj?.outlet_sound_power_level} and sound_pressure_level = ${obj?.sound_pressure_level} 
      and COALESCE(breakout_sound_power_level, 0) = ${obj?.breakout_sound_power_level || 0} and COALESCE(breakout_sound_pressure_level, 0) = ${obj?.breakout_sound_pressure_level || 0}
      and COALESCE(specific_fan_power, 0) = ${obj?.specific_fan_power || 0}`;
+     console.log(q);
   return new Promise((resolve, reject) => {
     pool.query(q, (err, res) => {
       err ? reject(err) : resolve(res.rows.length);
