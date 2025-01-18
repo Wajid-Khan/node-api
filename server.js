@@ -1684,6 +1684,12 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                     month: '2-digit',
                                     year: 'numeric',
                                 });
+
+                                console.log(unit_fan.rows[0]?.power);
+                                console.log(motor.rows[0]?.efficiency_100);
+                                console.log(vfd_eff);
+                                //power_input: ((unit_fan.rows[0]?.power / vfd_eff) / motor.rows[0]?.efficiency_100).toFixed(2),
+
                                 const data = {
                                     id: project_unit.rows[0]?.pu_no,
                                     com_name: project.rows[0]?.com_name,
@@ -1696,16 +1702,16 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                     pressure: project_unit.rows[0]?.pressure,
                                     pressure_unit: project_unit.rows[0]?.pressure_unit,
                                     volume_flow: project_unit.rows[0]?.airflow,
-                                    total_pressure: unit_fan.rows[0]?.total_pressure,
+                                    total_pressure: Math.round(unit_fan.rows[0]?.total_pressure),
                                     static_pressure: Math.round(unit_fan.rows[0]?.static_pressure),
                                     velocity_pressure: Math.round(unit_fan.rows[0]?.velocity_pressure),
                                     static_pressure_percentage: unit_fan.rows[0]?.static_pressure_percentage?.toFixed(2),
                                     total_efficiency_percentage: unit_fan.rows[0]?.total_efficiency_percentage?.toFixed(2),
                                     specific_fan_power: unit_fan.rows[0]?.specific_fan_power?.toFixed(2),
-                                    power: unit_fan.rows[0]?.power,
+                                    power: unit_fan.rows[0]?.power?.toFixed(2),
                                     fan_speed: Math.floor(unit_fan.rows[0]?.fan_speed),
-                                    outlet_sound_power_level: unit_fan.rows[0]?.outlet_sound_power_level,
-                                    sound_pressure_level: unit_fan.rows[0]?.sound_pressure_level,
+                                    outlet_sound_power_level: unit_fan.rows[0]?.outlet_sound_power_level?.toFixed(2),
+                                    sound_pressure_level: unit_fan.rows[0]?.sound_pressure_level?.toFixed(2),
                                     motor_make: motor.rows[0]?.motor_make,
                                     classification: motor.rows[0]?.classification,
                                     motor_poles: motor.rows[0]?.motor_poles,
@@ -1731,7 +1737,7 @@ app.get("/api/generatefandatasheet/:pu_id", async (req, res) => {
                                     mounting_arrangement: "B5/B14",
                                     start_up: "Direct Starting",
                                     windings_type: "1 Speed(1 Winding)",
-                                    power_input: ((unit_fan.rows[0]?.power / vfd_eff) / motor.rows[0]?.efficiency_100).toFixed(2),
+                                    power_input: ((unit_fan.rows[0]?.power / (vfd_eff/100)) / (motor.rows[0]?.efficiency_100/100)).toFixed(2),//((unit_fan.rows[0]?.power / vfd_eff) / motor.rows[0]?.efficiency_100).toFixed(2),
                                     system_efficiency: ((unit_fan.rows[0]?.total_efficiency_percentage * motor.rows[0]?.efficiency_100 * vfd_eff) / 10000).toFixed(2),
                                     gvp_graph: base64.rows[0].base64,
                                     gveff_graph: base64.rows[1].base64,
